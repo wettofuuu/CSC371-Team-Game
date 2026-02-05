@@ -11,9 +11,12 @@ public class Movement : MonoBehaviour
     Vector3 Target;
     private bool PlayerMoving;
     private bool Spinning;
+
+    public bool IsSpinning => Spinning;   // ✅ add this
+
     InputAction InputActionSystem;
     public LayerMask Ground;
-    
+
     void Awake(){
         InputActionSystem = InputSystem.actions.FindAction("MoveClick");
     }
@@ -25,21 +28,18 @@ public class Movement : MonoBehaviour
 
     void OnSpin(InputValue value){
         if (value.isPressed){
-            Spinning = value.isPressed;
+            Spinning = true;
             StartCoroutine(StopSpinAfterDelay(0.1f));
         }
     }
-    
+
     void OnMoveClick(InputValue value){
-        // when the lft click is pressed, this will fire
         if (value.isPressed){
             Vector2 MousePos = Mouse.current.position.ReadValue();
 
             Ray Ray = Camera.ScreenPointToRay(MousePos);
             RaycastHit Hit;
 
-            //this is a simple raycast that shoots to mouseposition given ground
-            
             if (Physics.Raycast(Ray, out Hit, 100f, Ground)){
                 Target = Hit.point;
                 Target.y = transform.position.y;
@@ -48,14 +48,8 @@ public class Movement : MonoBehaviour
         }
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start(){
-        
-    }
-
-    // Update is called once per frame
     void Update(){
-         if (Spinning){
+        if (Spinning){
             transform.Rotate(Vector3.up, SpinSpeed * Time.deltaTime);
         }
 
@@ -67,8 +61,6 @@ public class Movement : MonoBehaviour
             MoveSpeed * Time.deltaTime
         );
 
-        //later we can add pathfinding so its a good path for point and click
-        
         if (Vector3.Distance(transform.position, Target) < 0.05f) {
             PlayerMoving = false;
         }
