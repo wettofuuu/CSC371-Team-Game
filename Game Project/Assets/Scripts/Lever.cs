@@ -9,6 +9,8 @@ public class Lever : MonoBehaviour
     public Vector3 snappedPosition = new Vector3(-0.5f, -0.15f, 0f);
     public Vector3 snappedRotationEuler = new Vector3(0f, 0f, -40f);
 
+    public GameObject Portal;
+
     [Header("Scene transition")]
     public string level2SceneName = "Level2Temp";
     public float afterFlickDelay = 0.15f;
@@ -23,6 +25,7 @@ public class Lever : MonoBehaviour
         {
             if (movement.IsSpinning)
             {
+                Portal.active = true;
                 activated = true;
                 StartCoroutine(FlickThenTransition());
             }
@@ -31,7 +34,6 @@ public class Lever : MonoBehaviour
 
     private IEnumerator FlickThenTransition()
     {
-        // Snap lever to the "flicked" pose
         if (useLocalTransform)
         {
             transform.localPosition = snappedPosition;
@@ -46,9 +48,5 @@ public class Lever : MonoBehaviour
         yield return new WaitForSeconds(afterFlickDelay);
 
         // Fade + load next scene
-        if (ScreenFader.Instance != null)
-            yield return ScreenFader.Instance.FadeToScene(level2SceneName);
-        else
-            UnityEngine.SceneManagement.SceneManager.LoadScene(level2SceneName);
     }
 }
