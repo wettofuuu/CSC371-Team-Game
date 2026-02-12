@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class TeleportScene : MonoBehaviour
 {
-    public string SceneName = "Level2Temp";
+    public string SceneName = "Level2Transition";
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

@@ -12,7 +12,7 @@ public class Lever : MonoBehaviour
     public GameObject Portal;
 
     [Header("Scene transition")]
-    public string level2SceneName = "Level2Temp";
+    public string level2SceneName = "Level2Transition";
     public float afterFlickDelay = 0.15f;
 
     private bool activated = false;
@@ -25,7 +25,7 @@ public class Lever : MonoBehaviour
         {
             if (movement.IsSpinning)
             {
-                Portal.active = true;
+                Portal.SetActive(true);
                 activated = true;
                 StartCoroutine(FlickThenTransition());
             }
