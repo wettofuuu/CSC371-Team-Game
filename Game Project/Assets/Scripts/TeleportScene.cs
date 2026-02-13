@@ -3,21 +3,21 @@ using UnityEngine;
 
 public class TeleportScene : MonoBehaviour
 {
+    [SerializeField] private ParticleSystem particleSystem;
     public string SceneName = "Level2Transition";
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
+    void Start(){
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update(){
         
     }
 
     void OnCollisionEnter(Collision collision)
     {
+        particleSystem.Play();
+
         StartCoroutine(Teleport()); 
     }
 
