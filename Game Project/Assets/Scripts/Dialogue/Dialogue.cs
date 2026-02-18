@@ -1,9 +1,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Events;
+using TMPro;
+
 public class Dialogue : MonoBehaviour
 {
     public GameObject DialogueBox;
+    public TextMeshProUGUI DialogueTextbox;
     public NonPlayableMovement Npc;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -27,10 +30,13 @@ public class Dialogue : MonoBehaviour
         }
     }
 
-    public void DialogueTrigger(){
+    public void DialogueTrigger(string DialogueText){
         if (Npc != null){
             Npc.Jump();
         }
+
+        DialogueTextbox.text = DialogueText;
+        
 
         DialogueBox.SetActive(true);
     }
