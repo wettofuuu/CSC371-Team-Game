@@ -25,6 +25,7 @@ public class CameraZoneSwitch : MonoBehaviour
             player.position.x < triggerX &&
             player.position.z < triggerZ)
         {
+            Debug.Log("Hello");
             swooping = true;
         }
 
