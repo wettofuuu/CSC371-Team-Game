@@ -5,6 +5,7 @@ public class DistanceDetection : MonoBehaviour
     public Transform Player;
     private bool Detected = false;
     public float DetectionRange = 5f;
+    public DialogueData NpcDialogue;
 
     public Dialogue DialogueScript;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -25,8 +26,9 @@ public class DistanceDetection : MonoBehaviour
 
     void Detect(){
         Detected = true;
-        Debug.Log("Alerted");
 
-        DialogueScript.DialogueTrigger();
+        for (int i = 0; i < NpcDialogue.DialogueLines.Length; i++){
+            DialogueScript.DialogueTrigger(NpcDialogue.DialogueLines[i]);
+        }
     }
 }
