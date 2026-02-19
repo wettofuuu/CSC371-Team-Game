@@ -38,6 +38,9 @@ public class Movement : MonoBehaviour
     private bool isDashing = false;
     private float lastDashTime = -999f;
 
+    // ---- FURBALL ----
+    public GameObject Furball;
+
     // Call these from powerups
     public void EnableJump() => CanJump = true;
     public void EnableDash() => CanDash = true;
@@ -115,6 +118,12 @@ public class Movement : MonoBehaviour
         if (Time.time < lastDashTime + dashCooldown) return;
 
         StartCoroutine(DashPounce());
+    }
+
+    private void OnFurball(InputValue value){
+        if (!value.isPressed) return;
+        if (Furball == null) return;
+        StartCoroutine(SpitFurball());
     }
 
     private bool traversingLink = false;
@@ -196,6 +205,24 @@ public class Movement : MonoBehaviour
         agent.isStopped = false;
 
         isJumping = false;
+    }
+
+    private IEnumerator SpitFurball()
+    {
+
+        Vector3 SpawnPosition = transform.position + transform.forward * 1.0f;
+        Quaternion SpawnRotation = transform.rotation;
+
+        GameObject NewFurball = Instantiate(Furball, SpawnPosition, SpawnRotation);
+        Rigidbody Rb = NewFurball.GetComponent<Rigidbody>();
+        if (Rb != null)
+        {
+            Rb.linearVelocity = transform.forward * 10f;
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        Destroy(NewFurball);
     }
 
     private IEnumerator DashPounce()

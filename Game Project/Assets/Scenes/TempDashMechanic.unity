@@ -3191,6 +3191,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 330585545}
     - target: {fileID: 239109695149022030, guid: f104e902b113627489bfe69eb743c6c4, type: 3}
+      propertyPath: Furball
+      value: 
+      objectReference: {fileID: 4595264198447386448, guid: 573b2e534d5c4ca40b2eca14bdcd172b, type: 3}
+    - target: {fileID: 239109695149022030, guid: f104e902b113627489bfe69eb743c6c4, type: 3}
       propertyPath: dashCooldown
       value: 1
       objectReference: {fileID: 0}
