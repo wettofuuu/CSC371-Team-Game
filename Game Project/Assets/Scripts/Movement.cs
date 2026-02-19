@@ -209,7 +209,6 @@ public class Movement : MonoBehaviour
 
     private IEnumerator SpitFurball()
     {
-
         Vector3 SpawnPosition = transform.position + transform.forward * 1.0f;
         Quaternion SpawnRotation = transform.rotation;
 
