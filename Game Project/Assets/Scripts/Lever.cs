@@ -26,6 +26,11 @@ public class Lever : MonoBehaviour
             if (movement.IsSpinning)
             {
                 Portal.SetActive(true);
+                AudioSource doorAudio = Portal.GetComponent<AudioSource>();
+                    if (doorAudio != null)
+                        {
+                            doorAudio.PlayOneShot(doorAudio.clip);
+                        }
                 activated = true;
                 StartCoroutine(FlickThenTransition());
             }
