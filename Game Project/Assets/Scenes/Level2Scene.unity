@@ -8852,6 +8852,7 @@ MonoBehaviour:
   door: {fileID: 311509523}
   targetZ: -0.5
   doorMoveSpeed: 1.5
+  doorAudio: {fileID: 0}
 --- !u!136 &202964232
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -13924,7 +13925,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: f8e00ada3ad5a704aacaaa21f5dde4b7, type: 3}
+  m_Resource: {fileID: 8300000, guid: 1996e58b56c2a41fe87673bcd1a76284, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -36340,6 +36341,7 @@ MonoBehaviour:
   door: {fileID: 311509523}
   targetZ: -0.5
   doorMoveSpeed: 1.5
+  doorAudio: {fileID: 0}
 --- !u!136 &801847902
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -52728,6 +52730,7 @@ MonoBehaviour:
   door: {fileID: 311509523}
   targetZ: -0.5
   doorMoveSpeed: 1.5
+  doorAudio: {fileID: 0}
 --- !u!136 &1220875915
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -85919,6 +85922,7 @@ MonoBehaviour:
   door: {fileID: 311509523}
   targetZ: -0.5
   doorMoveSpeed: 1.5
+  doorAudio: {fileID: 0}
 --- !u!1 &2018353762
 GameObject:
   m_ObjectHideFlags: 0
