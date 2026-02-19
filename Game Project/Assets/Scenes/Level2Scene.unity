@@ -86050,8 +86050,8 @@ MonoBehaviour:
   leverAnimationTime: 0.25
   door: {fileID: 311509523}
   targetZ: -0.5
-  doorMoveSpeed: 0.8
-  doorAudio: {fileID: 1431299250}
+  doorMoveSpeed: 1.5
+  doorAudio: {fileID: 0}
 --- !u!1 &2018353762
 GameObject:
   m_ObjectHideFlags: 0
