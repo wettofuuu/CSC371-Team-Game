@@ -10,12 +10,15 @@ public class LeverOpenDoor : MonoBehaviour
     public Vector3 snappedRotationEuler = new Vector3(0f, 0f, -40f);
 
     [Header("Lever Animation")]
-    public float leverAnimationTime = 0.25f; // How long lever takes to move
+    public float leverAnimationTime = 0.25f;
 
     [Header("Door Settings")]
     public Transform door;
     public float targetZ = -0.5f;
     public float doorMoveSpeed = 1.5f;
+
+    [Header("Door Audio")]
+    public AudioSource doorAudio;   // Drag the Door's AudioSource here
 
     private bool activated = false;
 
@@ -36,6 +39,13 @@ public class LeverOpenDoor : MonoBehaviour
     private IEnumerator FlickThenOpenDoor()
     {
         yield return StartCoroutine(AnimateLever());
+
+        // 🔊 PLAY DOOR SOUND ONCE WHEN DOOR STARTS MOVING
+        if (doorAudio == null && door != null)
+            doorAudio = door.GetComponent<AudioSource>();
+
+        if (doorAudio != null)
+            doorAudio.Play();
 
         // Move door smoothly
         if (door != null)

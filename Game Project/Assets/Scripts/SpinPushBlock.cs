@@ -24,10 +24,12 @@ public class SpinPushBlock : MonoBehaviour
 
     private NavMeshObstacle obstacle;
     private float startY;
+    private AudioSource audioSource;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>(); 
         rb.useGravity = true;
 
         // Don't rotate, but allow moving/falling
@@ -85,6 +87,7 @@ public class SpinPushBlock : MonoBehaviour
     IEnumerator MoveOneStep(float targetX, float targetZ)
     {
         moving = true;
+        if (audioSource != null) audioSource.Play();
 
         // IMPORTANT: disable obstacle while moving so carving does NOT spam recalcs (can freeze)
         if (obstacle != null) obstacle.enabled = false;
