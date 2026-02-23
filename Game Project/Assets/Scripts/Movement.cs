@@ -162,50 +162,46 @@ public class Movement : MonoBehaviour
         traversingLink = false;
     }
 
-    private IEnumerator JumpForwardArc()
+private IEnumerator JumpForwardArc()
+{
+    isJumping = true;
+
+    agent.isStopped = true;
+    agent.updatePosition = false;
+    agent.updateRotation = false;
+
+    Rigidbody rb = GetComponent<Rigidbody>();
+
+    Vector3 forwardFlat = transform.forward;
+    forwardFlat.y = 0f;
+    forwardFlat.Normalize();
+
+    float gravity = Physics.gravity.y;
+
+    float verticalVelocity = Mathf.Sqrt(-2f * gravity * jumpHeight);
+    float horizontalVelocity = jumpDistance / jumpDuration;
+
+    rb.linearVelocity = forwardFlat * horizontalVelocity + Vector3.up * verticalVelocity;
+
+    yield return new WaitUntil(() => !IsGrounded());
+
+    yield return new WaitUntil(() => IsGrounded());
+
+    Debug.Log("Grounded");
+
+    rb.linearVelocity = Vector3.zero;
+
+    if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 2f, NavMesh.AllAreas))
     {
-        isJumping = true;
-
-        agent.isStopped = true;
-        agent.updatePosition = false;
-
-        Vector3 start = transform.position;
-
-        // jump direction = where the player is currently facing (base look + spin already applied)
-        Vector3 forwardFlat = transform.forward;
-        forwardFlat.y = 0f;
-        forwardFlat = forwardFlat.normalized;
-
-        Vector3 desiredEnd = start + forwardFlat * jumpDistance;
-
-        Vector3 end = desiredEnd;
-        if (NavMesh.SamplePosition(desiredEnd, out NavMeshHit navHit, 2.0f, NavMesh.AllAreas))
-            end = navHit.position;
-
-        float t = 0f;
-        while (t < 1f)
-        {
-            t += Time.deltaTime / Mathf.Max(0.01f, jumpDuration);
-
-            Vector3 pos = Vector3.Lerp(start, end, t);
-
-            float height = 4f * jumpHeight * t * (1f - t);
-            pos.y += height;
-
-            transform.position = pos;
-            yield return null;
-        }
-
-        transform.position = end;
-
-        agent.Warp(end);
-        agent.nextPosition = end;
-
-        agent.updatePosition = true;
-        agent.isStopped = false;
-
-        isJumping = false;
+        agent.Warp(hit.position);
     }
+
+    agent.updatePosition = true;
+    agent.updateRotation = true;
+    agent.isStopped = false;
+
+    isJumping = false;
+}
 
     private IEnumerator SpitFurball()
     {
@@ -268,6 +264,26 @@ public class Movement : MonoBehaviour
 
         isDashing = false;
     }
+
+private bool IsGrounded()
+{
+    CapsuleCollider capsule = GetComponent<CapsuleCollider>();
+
+    Vector3 center = transform.position + capsule.center;
+
+    float radius = capsule.radius * 0.95f;
+    float rayDistance = (capsule.height / 2f - capsule.radius) + 0.1f;
+
+    return Physics.SphereCast(
+        center,
+        radius,
+        Vector3.down,
+        out RaycastHit hit,
+        rayDistance,
+        ~0,
+        QueryTriggerInteraction.Ignore
+    );
+}
 
     private void Update()
     {
