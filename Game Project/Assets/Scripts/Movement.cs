@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(Rigidbody))]
 public class Movement : MonoBehaviour
 {
     public Camera Camera;
@@ -12,56 +13,78 @@ public class Movement : MonoBehaviour
 
     public LayerMask Ground;
 
+    [Header("Collision / Blocking")]
+    [SerializeField] private LayerMask Solid;   // include WALL layers here
+    [SerializeField] private float capsuleSkin = 0.02f;
+
+    [Header("Void / Falling")]
+    [SerializeField] private float killY = -20f;
+    [SerializeField] private Transform respawnPoint; // optional
+
     private NavMeshAgent agent;
+    private Rigidbody rb;
+
+    private Vector3 spawnPos;
+    private Quaternion spawnRot;
+
+    private bool isFalling = false;
 
     private bool Spinning;
     public bool IsSpinning => Spinning;
-
-    // lets other scripts (lever / blocks) detect a spin reliably
     public float LastSpinTime { get; private set; } = -999f;
 
-    // ---- JUMP / LOOK ----
     [Header("Jump Settings")]
-    [SerializeField] private float jumpDistance = 3f;     // how far forward the jump goes
-    [SerializeField] private float jumpHeight = 2f;       // arc height
-    [SerializeField] private float jumpDuration = 0.35f;  // time in air
+    [SerializeField] private float jumpDistance = 3f;
+    [SerializeField] private float jumpHeight = 2f;
+    [SerializeField] private float jumpDuration = 0.35f;
 
     public bool CanJump { get; private set; } = false;
     private bool isJumping = false;
 
-    // ---- DASH ----
     [Header("Dash Settings")]
-    [SerializeField] private float dashDistance = 4f;     // how far the pounce goes
-    [SerializeField] private float dashDuration = 0.12f;  // very quick
-    [SerializeField] private float dashCooldown = 0.6f;   // time before next dash
+    [SerializeField] private float dashDistance = 4f;
+    [SerializeField] private float dashDuration = 0.12f;
+    [SerializeField] private float dashCooldown = 0.6f;
+
     public bool CanDash { get; private set; } = false;
     private bool isDashing = false;
     private float lastDashTime = -999f;
 
-    // ---- FURBALL ----
     public GameObject Furball;
 
-    // Call these from powerups
-    public void EnableJump() => CanJump = true;
-    public void EnableDash() => CanDash = true;
-
-    // ---- LOOK + SPIN COMPOSITION ----
     private Quaternion baseLookRotation = Quaternion.identity;
     private float spinYaw = 0f;
+
+    private bool traversingLink = false;
+
+    public void EnableJump() => CanJump = true;
+    public void EnableDash() => CanDash = true;
 
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        rb = GetComponent<Rigidbody>();
+
+        spawnPos = transform.position;
+        spawnRot = transform.rotation;
+
         agent.speed = MoveSpeed;
         agent.stoppingDistance = 0.1f;
         agent.autoBraking = true;
-
         agent.acceleration = 12f;
         agent.angularSpeed = 720f;
 
-        agent.autoTraverseOffMeshLink = true;
+        // You are manually traversing links -> keep this OFF to avoid double behaviour
+        agent.autoTraverseOffMeshLink = false;
 
         baseLookRotation = transform.rotation;
+
+        // While NavMeshAgent controls the character, keep physics out of it
+        rb.isKinematic = true;
+        rb.useGravity = false;
+
+        if (Solid.value == 0)
+            Debug.LogWarning($"{name}: Solid LayerMask is empty. Jump/Dash will pass through walls.", this);
     }
 
     private IEnumerator StopSpinAfterDelay(float delay)
@@ -82,7 +105,8 @@ public class Movement : MonoBehaviour
     private void OnMoveClick(InputValue value)
     {
         if (!value.isPressed) return;
-        if (isJumping || isDashing) return;
+        if (isJumping || isDashing || isFalling) return;
+        if (!agent.enabled) return;
 
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = Camera.ScreenPointToRay(mousePos);
@@ -97,36 +121,36 @@ public class Movement : MonoBehaviour
         }
     }
 
-    // Spacebar (Input System action named "Jump")
     private void OnJump(InputValue value)
     {
         if (!value.isPressed) return;
         if (!CanJump) return;
-        if (isJumping || isDashing) return;
+        if (isJumping || isDashing || isFalling) return;
         if (traversingLink) return;
+        if (!agent.enabled) return;
 
-        StartCoroutine(JumpForwardArc());
+        StartCoroutine(JumpForwardArc_Swept());
     }
 
-    // Dash action (bind a Dash action in your Input Actions and call this)
     private void OnDash(InputValue value)
     {
         if (!value.isPressed) return;
         if (!CanDash) return;
-        if (isDashing || isJumping) return;
+        if (isDashing || isJumping || isFalling) return;
         if (traversingLink) return;
+        if (!agent.enabled) return;
         if (Time.time < lastDashTime + dashCooldown) return;
 
-        StartCoroutine(DashPounce());
+        StartCoroutine(DashPounce_Swept());
     }
 
-    private void OnFurball(InputValue value){
+    private void OnFurball(InputValue value)
+    {
         if (!value.isPressed) return;
         if (Furball == null) return;
+
         StartCoroutine(SpitFurball());
     }
-
-    private bool traversingLink = false;
 
     private IEnumerator TraverseLink()
     {
@@ -142,18 +166,20 @@ public class Movement : MonoBehaviour
 
         while (Vector3.Distance(transform.position, endPos) > 0.02f)
         {
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                endPos,
-                speed * Time.deltaTime
-            );
+            Vector3 from = transform.position;
+            Vector3 desired = Vector3.MoveTowards(from, endPos, speed * Time.deltaTime);
+
+            // Optional: if you want link traversal to also collide with walls, sweep here too.
+            transform.position = desired;
+            agent.nextPosition = transform.position;
+
             yield return null;
         }
 
         transform.position = endPos;
-        agent.Warp(endPos);
         agent.nextPosition = endPos;
 
+        agent.Warp(endPos);
         agent.CompleteOffMeshLink();
 
         agent.updatePosition = true;
@@ -162,6 +188,7 @@ public class Movement : MonoBehaviour
         traversingLink = false;
     }
 
+<<<<<<< HEAD
 private IEnumerator JumpForwardArc()
 {
     isJumping = true;
@@ -221,50 +248,277 @@ private IEnumerator JumpForwardArc()
     }
 
     private IEnumerator DashPounce()
+=======
+    private bool IsOnNavMesh(Vector3 pos, float maxDist = 0.25f)
+    {
+        return NavMesh.SamplePosition(pos, out _, maxDist, NavMesh.AllAreas);
+    }
+
+    private bool HasGroundBelow(Vector3 pos, float maxDistance = 2.5f)
+    {
+        Vector3 origin = pos + Vector3.up * 0.1f;
+        return Physics.Raycast(origin, Vector3.down, maxDistance, Ground, QueryTriggerInteraction.Ignore);
+    }
+
+    private void BeginFall()
+    {
+        if (isFalling) return;
+
+        isFalling = true;
+
+        // Stop any jump/dash coroutines cleanly
+        StopAllCoroutines();
+        isJumping = false;
+        isDashing = false;
+        traversingLink = false;
+        Spinning = false;
+        spinYaw = 0f;
+
+        if (agent.enabled)
+        {
+            agent.ResetPath();
+            agent.isStopped = true;
+            agent.updatePosition = false;
+            agent.updateRotation = false;
+            agent.enabled = false;
+        }
+
+        rb.isKinematic = false;
+        rb.useGravity = true;
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+    }
+
+    private void Respawn()
+    {
+        Vector3 pos = respawnPoint ? respawnPoint.position : spawnPos;
+        Quaternion rot = respawnPoint ? respawnPoint.rotation : spawnRot;
+
+        // FIRST: make it dynamic so we are allowed to edit velocity
+        rb.isKinematic = false;
+        rb.useGravity = false;
+
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        // THEN freeze physics again
+        rb.isKinematic = true;
+
+        transform.SetPositionAndRotation(pos, rot);
+        baseLookRotation = rot;
+
+        agent.enabled = true;
+        agent.Warp(pos);
+        agent.updatePosition = true;
+        agent.updateRotation = true;
+        agent.isStopped = false;
+
+        isFalling = false;
+    }
+
+    private void GetCapsulePoints(Vector3 atPos, out Vector3 p1, out Vector3 p2, out float radius)
+    {
+        // Prefer an actual CapsuleCollider (recommended you add one to the Player root)
+        CapsuleCollider cap = GetComponent<CapsuleCollider>();
+
+        if (cap != null)
+        {
+            radius = cap.radius * Mathf.Max(transform.lossyScale.x, transform.lossyScale.z);
+            float height = cap.height * transform.lossyScale.y;
+            float centerY = cap.center.y * transform.lossyScale.y;
+
+            float cylinder = Mathf.Max(0f, height - 2f * radius);
+            Vector3 center = atPos + Vector3.up * centerY;
+
+            p1 = center + Vector3.up * (cylinder * 0.5f);
+            p2 = center - Vector3.up * (cylinder * 0.5f);
+            return;
+        }
+
+        // Fallback: use agent dimensions (better than hard-coded defaults)
+        radius = agent.radius;
+        float h = agent.height;
+        float centerAgentY = agent.baseOffset; // commonly equals height/2 when pivot at feet
+
+        float cylinder2 = Mathf.Max(0f, h - 2f * radius);
+        Vector3 center2 = atPos + Vector3.up * centerAgentY;
+
+        p1 = center2 + Vector3.up * (cylinder2 * 0.5f);
+        p2 = center2 - Vector3.up * (cylinder2 * 0.5f);
+    }
+
+    private bool SweepCapsule(Vector3 from, Vector3 to, out Vector3 corrected)
+    {
+        Vector3 delta = to - from;
+        float dist = delta.magnitude;
+
+        if (dist < 0.0001f)
+        {
+            corrected = to;
+            return false;
+        }
+
+        Vector3 dir = delta / dist;
+
+        GetCapsulePoints(from, out Vector3 p1, out Vector3 p2, out float radius);
+
+        if (Physics.CapsuleCast(p1, p2, radius, dir, out RaycastHit hit, dist, Solid, QueryTriggerInteraction.Ignore))
+        {
+            float move = Mathf.Max(0f, hit.distance - capsuleSkin);
+            corrected = from + dir * move;
+            return true;
+        }
+
+        corrected = to;
+        return false;
+    }
+
+    private void PauseNavForManualMove()
+    {
+        agent.isStopped = true;
+        agent.updatePosition = false;
+        agent.updateRotation = false;
+    }
+
+    private void FinishManualMove()
+    {
+        Vector3 pos = transform.position;
+
+        // Snap down onto ground if there is ground underneath (prevents hovering after arc)
+        Vector3 origin = pos + Vector3.up * 2f;
+        if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, 5f, Ground, QueryTriggerInteraction.Ignore))
+        {
+            float bottomOffset = 0f;
+
+            CapsuleCollider cap = GetComponent<CapsuleCollider>();
+            if (cap != null)
+            {
+                float scaledHeight = cap.height * transform.lossyScale.y;
+                float scaledRadius = cap.radius * transform.lossyScale.y;
+
+                float half = scaledHeight * 0.5f;
+                bottomOffset = half - scaledRadius;  // distance from center to bottom sphere edge
+            }
+
+            pos.y = hit.point.y + bottomOffset;
+            transform.position = pos;
+        }
+
+        agent.nextPosition = transform.position;
+
+        // No platform under us -> fall
+        if (!HasGroundBelow(transform.position))
+        {
+            BeginFall();
+            return;
+        }
+
+        if (NavMesh.SamplePosition(transform.position, out NavMeshHit navHit, 1.5f, NavMesh.AllAreas))
+        {
+            Vector3 snapped = navHit.position;
+
+            transform.position = snapped;
+            agent.Warp(snapped);
+
+            agent.updatePosition = true;
+            agent.updateRotation = true;
+            agent.isStopped = false;
+        }
+        else
+        {
+            BeginFall();
+        }
+    }
+
+    private IEnumerator JumpForwardArc_Swept()
+    {
+        isJumping = true;
+
+        PauseNavForManualMove();
+
+        Vector3 start = transform.position;
+
+        Vector3 forwardFlat = transform.forward;
+        forwardFlat.y = 0f;
+        forwardFlat = forwardFlat.sqrMagnitude > 0.0001f ? forwardFlat.normalized : Vector3.forward;
+
+        Vector3 target = start + forwardFlat * jumpDistance;
+
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / Mathf.Max(0.01f, jumpDuration);
+
+            Vector3 desired = Vector3.Lerp(start, target, t);
+            float arc = 4f * jumpHeight * t * (1f - t);
+            desired.y += arc;
+
+            Vector3 from = transform.position;
+
+            // Sweep every frame so we cannot tunnel through walls
+            if (SweepCapsule(from, desired, out Vector3 corrected))
+            {
+                transform.position = corrected;
+                agent.nextPosition = corrected;
+                break;
+            }
+
+            transform.position = desired;
+            agent.nextPosition = desired;
+
+            yield return null;
+        }
+
+        // Land at current position (could be clamped by a wall)
+        FinishManualMove();
+
+        isJumping = false;
+    }
+
+    private IEnumerator DashPounce_Swept()
+>>>>>>> 65193f89 (fixed jump and dash mechanics)
     {
         isDashing = true;
         lastDashTime = Time.time;
 
-        // Pause agent while manually moving
-        agent.isStopped = true;
-        agent.updatePosition = false;
+        PauseNavForManualMove();
 
         Vector3 start = transform.position;
 
-        // dash direction = forward facing (no arc)
         Vector3 forwardFlat = transform.forward;
         forwardFlat.y = 0f;
-        forwardFlat = forwardFlat.normalized;
+        forwardFlat = forwardFlat.sqrMagnitude > 0.0001f ? forwardFlat.normalized : Vector3.forward;
 
-        Vector3 desiredEnd = start + forwardFlat * dashDistance;
-
-        // If you want dash to ignore small obstacles and go as far as possible on navmesh,
-        // sample a path along the ray. For now, try to land on navmesh near desiredEnd.
-        Vector3 end = desiredEnd;
-        if (NavMesh.SamplePosition(desiredEnd, out NavMeshHit navHit, 2.5f, NavMesh.AllAreas))
-            end = navHit.position;
+        Vector3 target = start + forwardFlat * dashDistance;
 
         float t = 0f;
         while (t < 1f)
         {
             t += Time.deltaTime / Mathf.Max(0.001f, dashDuration);
 
-            Vector3 pos = Vector3.Lerp(start, end, t);
-            transform.position = pos;
+            Vector3 desired = Vector3.Lerp(start, target, t);
+
+            Vector3 from = transform.position;
+
+            if (SweepCapsule(from, desired, out Vector3 corrected))
+            {
+                transform.position = corrected;
+                agent.nextPosition = corrected;
+                break;
+            }
+
+            transform.position = desired;
+            agent.nextPosition = desired;
+
             yield return null;
         }
 
-        // finish at end, resync agent
-        transform.position = end;
-        agent.Warp(end);
-        agent.nextPosition = end;
-
-        agent.updatePosition = true;
-        agent.isStopped = false;
+        FinishManualMove();
 
         isDashing = false;
     }
 
+<<<<<<< HEAD
 private bool IsGrounded()
 {
     CapsuleCollider capsule = GetComponent<CapsuleCollider>();
@@ -286,11 +540,29 @@ private bool IsGrounded()
 }
 
     private void Update()
+=======
+    private IEnumerator SpitFurball()
+>>>>>>> 65193f89 (fixed jump and dash mechanics)
     {
-        if (agent.speed != MoveSpeed) agent.speed = MoveSpeed;
+        Vector3 spawnPos2 = transform.position + transform.forward * 1.0f;
+        Quaternion spawnRot = transform.rotation;
 
+        GameObject newFurball = Instantiate(Furball, spawnPos2, spawnRot);
+        Rigidbody furRb = newFurball.GetComponent<Rigidbody>();
+        if (furRb != null)
+        {
+            furRb.linearVelocity = transform.forward * 10f;
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        Destroy(newFurball);
+    }
+
+    private void UpdateLookAndSpin()
+    {
         // ---- Update base look rotation toward mouse (yaw only) ----
-        if (!isJumping && !isDashing) // don't change base look mid-jump/dash
+        if (!isJumping && !isDashing)
         {
             Vector2 mousePos = Mouse.current.position.ReadValue();
             Ray ray = Camera.ScreenPointToRay(mousePos);
@@ -304,28 +576,35 @@ private bool IsGrounded()
                 dir.y = 0f;
 
                 if (dir.sqrMagnitude > 0.0001f)
-                {
                     baseLookRotation = Quaternion.LookRotation(dir);
-                }
             }
         }
 
-        // ---- Spin is an offset on top of the base look ----
-        if (Spinning)
-        {
-            spinYaw += SpinSpeed * Time.deltaTime;
-        }
-        else
-        {
-            spinYaw = 0f;
-        }
+        if (Spinning) spinYaw += SpinSpeed * Time.deltaTime;
+        else spinYaw = 0f;
 
-        // Apply combined rotation (look + spin)
         transform.rotation = baseLookRotation * Quaternion.Euler(0f, spinYaw, 0f);
+    }
 
-        if (agent.isOnOffMeshLink && !traversingLink && !isJumping && !isDashing)
+    private void Update()
+    {
+        // Falling / respawn
+        if (isFalling)
         {
-            StartCoroutine(TraverseLink());
+            if (transform.position.y < killY)
+                Respawn();
+
+            // Optional: still rotate while falling
+            UpdateLookAndSpin();
+            return;
         }
+
+        if (agent.enabled && agent.speed != MoveSpeed)
+            agent.speed = MoveSpeed;
+
+        UpdateLookAndSpin();
+
+        if (agent.enabled && agent.isOnOffMeshLink && !traversingLink && !isJumping && !isDashing)
+            StartCoroutine(TraverseLink());
     }
 }
