@@ -1,9 +1,5 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Game Project/Assets/Scenes/Level4Design/NavMesh-NavMesh.asset.meta
-guid: f6011939a0a8e4d9fb86351999907236
-========
-guid: 98b9531b41210dc41a2eadab03fe3984
->>>>>>>> 65193f89 (fixed jump and dash mechanics):Game Project/Assets/Scenes/TempJumpMechanic/NavMesh-NavMesh.asset.meta
+
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 23800000
