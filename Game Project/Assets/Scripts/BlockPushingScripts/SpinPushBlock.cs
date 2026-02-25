@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(Rigidbody))]
-public class SpinPushBlock : MonoBehaviour
+public class SpinPushBlock : MonoBehaviour, IPushableBlock
 {
     [Header("Grid Move")]
     public float gridStep = 1f;            // tile size
