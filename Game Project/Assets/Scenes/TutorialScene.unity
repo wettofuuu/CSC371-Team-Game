@@ -1671,7 +1671,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45a87eafec2fb4375b42345741a889c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level0
-  DialogueLines: []
+  DialogueLines:
+  - 
 --- !u!4 &131894658 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 1905706c28dfa724dbd7f00bd652af35, type: 3}
@@ -16787,6 +16788,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2246085019066838664, guid: 7400406f8776a452986f2ade93b293ca, type: 3}
+      propertyPath: m_Constraints
+      value: 112
+      objectReference: {fileID: 0}
     - target: {fileID: 2404590139766817075, guid: 7400406f8776a452986f2ade93b293ca, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.6
@@ -16865,6 +16870,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 639606597187610147, guid: 7400406f8776a452986f2ade93b293ca, type: 3}
+    - {fileID: 2797800412555278721, guid: 7400406f8776a452986f2ade93b293ca, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -19923,7 +19929,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 1
   m_VoxelSize: 0.5
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: d5b58b2419e50534c9b2abfc671ba978, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: cd845c362cdcb254da5b8ef1604b831a, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &1024491729
 Transform:
