@@ -43,6 +43,6 @@ public class PauseMenu : MonoBehaviour
     {
         
         Time.timeScale = 1f;
-        SceneManager.LoadScene("Level2Scene"); 
+        SceneManager.LoadScene("MainMenuScene"); 
     }
 }
