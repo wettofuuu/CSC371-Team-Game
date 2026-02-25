@@ -188,67 +188,6 @@ public class Movement : MonoBehaviour
         traversingLink = false;
     }
 
-<<<<<<< HEAD
-private IEnumerator JumpForwardArc()
-{
-    isJumping = true;
-
-    agent.isStopped = true;
-    agent.updatePosition = false;
-    agent.updateRotation = false;
-
-    Rigidbody rb = GetComponent<Rigidbody>();
-
-    Vector3 forwardFlat = transform.forward;
-    forwardFlat.y = 0f;
-    forwardFlat.Normalize();
-
-    float gravity = Physics.gravity.y;
-
-    float verticalVelocity = Mathf.Sqrt(-2f * gravity * jumpHeight);
-    float horizontalVelocity = jumpDistance / jumpDuration;
-
-    rb.linearVelocity = forwardFlat * horizontalVelocity + Vector3.up * verticalVelocity;
-
-    yield return new WaitUntil(() => !IsGrounded());
-
-    yield return new WaitUntil(() => IsGrounded());
-
-    Debug.Log("Grounded");
-
-    rb.linearVelocity = Vector3.zero;
-
-    if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 2f, NavMesh.AllAreas))
-    {
-        agent.Warp(hit.position);
-    }
-
-    agent.updatePosition = true;
-    agent.updateRotation = true;
-    agent.isStopped = false;
-
-    isJumping = false;
-}
-
-    private IEnumerator SpitFurball()
-    {
-        Vector3 SpawnPosition = transform.position + transform.forward * 1.0f;
-        Quaternion SpawnRotation = transform.rotation;
-
-        GameObject NewFurball = Instantiate(Furball, SpawnPosition, SpawnRotation);
-        Rigidbody Rb = NewFurball.GetComponent<Rigidbody>();
-        if (Rb != null)
-        {
-            Rb.linearVelocity = transform.forward * 10f;
-        }
-
-        yield return new WaitForSeconds(1f);
-
-        Destroy(NewFurball);
-    }
-
-    private IEnumerator DashPounce()
-=======
     private bool IsOnNavMesh(Vector3 pos, float maxDist = 0.25f)
     {
         return NavMesh.SamplePosition(pos, out _, maxDist, NavMesh.AllAreas);
@@ -476,7 +415,6 @@ private IEnumerator JumpForwardArc()
     }
 
     private IEnumerator DashPounce_Swept()
->>>>>>> 65193f89 (fixed jump and dash mechanics)
     {
         isDashing = true;
         lastDashTime = Time.time;
@@ -518,31 +456,7 @@ private IEnumerator JumpForwardArc()
         isDashing = false;
     }
 
-<<<<<<< HEAD
-private bool IsGrounded()
-{
-    CapsuleCollider capsule = GetComponent<CapsuleCollider>();
-
-    Vector3 center = transform.position + capsule.center;
-
-    float radius = capsule.radius * 0.95f;
-    float rayDistance = (capsule.height / 2f - capsule.radius) + 0.1f;
-
-    return Physics.SphereCast(
-        center,
-        radius,
-        Vector3.down,
-        out RaycastHit hit,
-        rayDistance,
-        ~0,
-        QueryTriggerInteraction.Ignore
-    );
-}
-
-    private void Update()
-=======
     private IEnumerator SpitFurball()
->>>>>>> 65193f89 (fixed jump and dash mechanics)
     {
         Vector3 spawnPos2 = transform.position + transform.forward * 1.0f;
         Quaternion spawnRot = transform.rotation;
