@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class DistanceDetection : MonoBehaviour
 {
+    [Header("Audio")]
+[SerializeField] private AudioSource npcAudio;
+[SerializeField] private AudioClip detectClip;
     public Transform Player;
     private bool Detected = false;
     public float DetectionRange = 5f;
@@ -25,6 +28,8 @@ public class DistanceDetection : MonoBehaviour
         if (!Detected && Distance <= DetectionRange)
         {
             Detected = true;
+            if (npcAudio != null && detectClip != null)
+                npcAudio.PlayOneShot(detectClip);
 
             if (ChangeRange){
                 DetectionRange = 2f;

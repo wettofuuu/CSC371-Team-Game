@@ -41,6 +41,18 @@ public class Movement : MonoBehaviour
     public bool IsSpinning => Spinning;
     public float LastSpinTime { get; private set; } = -999f;
 
+    // ================= AUDIO =================
+[Header("Audio Sources")]
+[SerializeField] private AudioSource footstepSource;   // looping
+[SerializeField] private AudioSource sfxSource;        // one-shot sounds
+
+[Header("Audio Clips")]
+[SerializeField] private AudioClip jumpClip;
+[SerializeField] private AudioClip dashClip;
+[SerializeField] private AudioClip furballClip;
+[SerializeField] private AudioClip landClip;
+[SerializeField] private AudioClip fallClip;
+
     [Header("Jump Settings")]
     [SerializeField] private float jumpDistance = 3f;
     [SerializeField] private float jumpHeight = 2f;
@@ -155,7 +167,8 @@ public class Movement : MonoBehaviour
         if (isJumping || isDashing || isFalling) return;
         if (traversingLink) return;
         if (!agent.enabled) return;
-
+        if (sfxSource && jumpClip)
+        sfxSource.PlayOneShot(jumpClip);
         StartCoroutine(JumpForwardArc_Swept());
     }
 
@@ -167,7 +180,9 @@ public class Movement : MonoBehaviour
         if (traversingLink) return;
         if (!agent.enabled) return;
         if (Time.time < lastDashTime + dashCooldown) return;
-
+        
+        if (sfxSource && dashClip)
+        sfxSource.PlayOneShot(dashClip);
         StartCoroutine(DashPounce_Swept());
     }
 
@@ -176,6 +191,8 @@ public class Movement : MonoBehaviour
         if (!value.isPressed) return;
         if (Furball == null) return;
 
+        if (sfxSource && furballClip)
+        sfxSource.PlayOneShot(furballClip);
         StartCoroutine(SpitFurball());
     }
 
@@ -246,6 +263,8 @@ public class Movement : MonoBehaviour
         rb.useGravity = true;
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
+        if (sfxSource && fallClip)
+        sfxSource.PlayOneShot(fallClip);
     }
 
     private void Respawn()
@@ -537,7 +556,22 @@ public class Movement : MonoBehaviour
             agent.speed = MoveSpeed;
 
         UpdateLookAndSpin();
+    // -------- FOOTSTEP AUDIO --------
+    if (footstepSource != null && agent.enabled && !isJumping && !isDashing && !isFalling)
+    {
+        bool moving = agent.velocity.magnitude > 0.1f;
 
+        if (moving)
+        {
+            if (!footstepSource.isPlaying)
+                footstepSource.Play();
+        }
+        else
+        {
+            if (footstepSource.isPlaying)
+                footstepSource.Pause();
+        }
+    }
         if (agent.enabled && agent.isOnOffMeshLink && !traversingLink && !isJumping && !isDashing)
             StartCoroutine(TraverseLink());
     }
