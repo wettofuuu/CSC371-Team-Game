@@ -297,8 +297,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a0042be6fa4ed644bbd33ba751d8848, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScreenFader
-  canvasGroup: {fileID: 0}
-  fadeCanvas: {fileID: 0}
+  canvasGroup: {fileID: 208433425}
+  fadeCanvas: {fileID: 1116147887}
   fadeOutTime: 0.35
   fadeInTime: 0.35
 --- !u!225 &208433425
@@ -310,7 +310,7 @@ CanvasGroup:
   m_GameObject: {fileID: 208433422}
   m_Enabled: 1
   m_Alpha: 1
-  m_Interactable: 1
+  m_Interactable: 0
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
 --- !u!114 &208433426
@@ -498,7 +498,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1116147885
 MonoBehaviour:
   m_ObjectHideFlags: 0

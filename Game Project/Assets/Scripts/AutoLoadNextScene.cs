@@ -7,6 +7,8 @@ public class AutoLoadNextScene : MonoBehaviour
     public string nextSceneName = "Level2Scene";
     public float delay = 1.5f;
 
+    private bool triggered = false;
+
     void Start()
     {
         StartCoroutine(LoadAfterDelay());
@@ -14,7 +16,19 @@ public class AutoLoadNextScene : MonoBehaviour
 
     IEnumerator LoadAfterDelay()
     {
-        yield return new WaitForSeconds(delay);
-        SceneManager.LoadScene(nextSceneName);
+        yield return new WaitForSecondsRealtime(delay); // IMPORTANT (timescale-proof)
+
+        if (triggered) yield break;
+        triggered = true;
+
+        if (ScreenFader.Instance != null)
+        {
+            yield return ScreenFader.Instance.FadeToScene(nextSceneName);
+        }
+        else
+        {
+            // fallback if fader not present
+            SceneManager.LoadScene(nextSceneName);
+        }
     }
 }

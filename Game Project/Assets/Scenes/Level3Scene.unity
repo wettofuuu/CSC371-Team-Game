@@ -18918,6 +18918,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8300000, guid: c1b2ead658bb9a8409f97096ae2c956d, type: 3}
     - target: {fileID: 2902680027644734259, guid: 83b5452fa9531450dafdbbce25919f51, type: 3}
+      propertyPath: livesText
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2902680027644734259, guid: 83b5452fa9531450dafdbbce25919f51, type: 3}
       propertyPath: sfxSource
       value: 
       objectReference: {fileID: 1906647781}

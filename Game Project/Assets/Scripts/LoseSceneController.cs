@@ -8,7 +8,11 @@ public class LoseSceneController : MonoBehaviour
 
     public void ReturnToMainMenu()
     {
-        Time.timeScale = 1f; // just in case the game was paused
+        Time.timeScale = 1f;
+
+        // Reset lives back to 9
+        Movement.ResetLives();
+
         SceneManager.LoadScene(mainMenuSceneName);
     }
 }
