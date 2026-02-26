@@ -5,27 +5,29 @@ public class TeleportScene : MonoBehaviour
 {
     [SerializeField] private ParticleSystem particleSystem;
     public string SceneName = "Level2Transition";
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start(){
-    }
 
-    // Update is called once per frame
-    void Update(){
-        
-    }
+    private bool teleporting = false;
 
-    void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        particleSystem.Play();
+        if (teleporting) return;
 
-        StartCoroutine(Teleport()); 
+        // Only teleport player
+        if (other.GetComponentInParent<Movement>() == null) return;
+
+        teleporting = true;
+
+        if (particleSystem != null)
+            particleSystem.Play();
+
+        StartCoroutine(Teleport());
     }
 
-    private IEnumerator Teleport(){
-        if (ScreenFader.Instance != null){
+    private IEnumerator Teleport()
+    {
+        if (ScreenFader.Instance != null)
             yield return ScreenFader.Instance.FadeToScene(SceneName);
-         } else {
+        else
             UnityEngine.SceneManagement.SceneManager.LoadScene(SceneName);
-         }
     }
 }
