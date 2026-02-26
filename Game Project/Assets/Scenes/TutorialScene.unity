@@ -17901,7 +17901,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2901947324754720540, guid: 83b5452fa9531450dafdbbce25919f51, type: 3}
       propertyPath: m_Height
-      value: 0.4
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 2901947324754720540, guid: 83b5452fa9531450dafdbbce25919f51, type: 3}
       propertyPath: m_Radius
@@ -26021,7 +26021,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: bf0ea3f86234fea4fa12a63a11e2771e, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
