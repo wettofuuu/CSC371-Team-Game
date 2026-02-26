@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.AI;
+using System.Collections;
 
 public class Piston : MonoBehaviour
 {
@@ -16,32 +18,25 @@ public class Piston : MonoBehaviour
     private bool retracting = false;
     private float waitTimer;
 
-    void Start()
-    {
+    void Start(){
         startPos = transform.localPosition;
         waitTimer = WaitTime;
         Direction = Direction.normalized;
     }
 
-    void Update()
-    {
-        if (!extending && !retracting)
-        {
+    void Update(){
+        if (!extending && !retracting){
             waitTimer -= Time.deltaTime;
-
-            if (waitTimer <= 0f)
-            {
+            if (waitTimer <= 0f){
                 extending = true;
             }
         }
 
-        if (extending)
-        {
+        if (extending){
             float move = SlamSpeed * Time.deltaTime;
             currentTravel += move;
 
-            if (currentTravel >= Distance)
-            {
+            if (currentTravel >= Distance){
                 currentTravel = Distance;
                 extending = false;
                 retracting = true;
@@ -50,19 +45,42 @@ public class Piston : MonoBehaviour
             transform.localPosition = startPos + Direction * currentTravel;
         }
 
-        if (retracting)
-        {
+        if (retracting){
             float move = RetractSpeed * Time.deltaTime;
             currentTravel -= move;
 
-            if (currentTravel <= 0f)
-            {
+            if (currentTravel <= 0f){
                 currentTravel = 0f;
                 retracting = false;
                 waitTimer = WaitTime;
             }
 
             transform.localPosition = startPos + Direction * currentTravel;
+        }
+    }
+
+    private IEnumerator ReenableAgent(NavMeshAgent Agent, Vector3 NewPosition){
+        yield return null; 
+
+        Agent.Warp(NewPosition);
+        Agent.enabled = true;
+    }
+
+    private void OnTriggerStay(Collider other){
+        if (other.CompareTag("Player") && extending){
+            NavMeshAgent Agent = other.GetComponent<NavMeshAgent>();
+
+            if (Agent != null)
+            {
+                Agent.enabled = false;
+
+                Vector3 WorldDirection = transform.TransformDirection(Direction);
+                float PushDistance = 2f;
+
+                other.transform.position += WorldDirection * PushDistance;
+
+                StartCoroutine(ReenableAgent(Agent, other.transform.position));
+            }
         }
     }
 }

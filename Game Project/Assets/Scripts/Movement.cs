@@ -2,6 +2,8 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
+using TMPro;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Rigidbody))]
@@ -12,6 +14,12 @@ public class Movement : MonoBehaviour
     public float SpinSpeed = 180f;
 
     public LayerMask Ground;
+
+    [Header("Lives")]
+    [SerializeField] private TMP_Text livesText;          // drag your TMP text here
+    [SerializeField] private string loseSceneName = "LoseScene";
+    public static int Lives { get; private set; } = 9;    // persists across scenes (static)
+    private static bool livesInitialized = false;
 
     [Header("Collision / Blocking")]
     [SerializeField] private LayerMask Solid;   // include WALL layers here
@@ -72,6 +80,19 @@ public class Movement : MonoBehaviour
     public void EnableJump() => CanJump = true;
     public void EnableDash() => CanDash = true;
 
+    // Call this when starting a NEW GAME (ex: MainMenu Play button)
+    public static void ResetLives()
+    {
+        Lives = 9;
+        livesInitialized = true;
+    }
+
+    private void UpdateLivesUI()
+    {
+        if (livesText != null)
+            livesText.text = $"Lives: {Lives}";
+    }
+
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -86,17 +107,23 @@ public class Movement : MonoBehaviour
         agent.acceleration = 12f;
         agent.angularSpeed = 720f;
 
-        // You are manually traversing links -> keep this OFF to avoid double behaviour
         agent.autoTraverseOffMeshLink = false;
 
         baseLookRotation = transform.rotation;
 
-        // While NavMeshAgent controls the character, keep physics out of it
         rb.isKinematic = true;
         rb.useGravity = false;
 
         if (Solid.value == 0)
             Debug.LogWarning($"{name}: Solid LayerMask is empty. Jump/Dash will pass through walls.", this);
+
+        // --- Lives init + UI ---
+        if (!livesInitialized)
+        {
+            Lives = 9;
+            livesInitialized = true;
+        }
+        UpdateLivesUI();
     }
 
     private IEnumerator StopSpinAfterDelay(float delay)
@@ -186,7 +213,6 @@ public class Movement : MonoBehaviour
             Vector3 from = transform.position;
             Vector3 desired = Vector3.MoveTowards(from, endPos, speed * Time.deltaTime);
 
-            // Optional: if you want link traversal to also collide with walls, sweep here too.
             transform.position = desired;
             agent.nextPosition = transform.position;
 
@@ -205,11 +231,6 @@ public class Movement : MonoBehaviour
         traversingLink = false;
     }
 
-    private bool IsOnNavMesh(Vector3 pos, float maxDist = 0.25f)
-    {
-        return NavMesh.SamplePosition(pos, out _, maxDist, NavMesh.AllAreas);
-    }
-
     private bool HasGroundBelow(Vector3 pos, float maxDistance = 2.5f)
     {
         Vector3 origin = pos + Vector3.up * 0.1f;
@@ -222,7 +243,6 @@ public class Movement : MonoBehaviour
 
         isFalling = true;
 
-        // Stop any jump/dash coroutines cleanly
         StopAllCoroutines();
         isJumping = false;
         isDashing = false;
@@ -249,17 +269,26 @@ public class Movement : MonoBehaviour
 
     private void Respawn()
     {
+        // --- Lose a life on every respawn ---
+        Lives--;
+        UpdateLivesUI();
+
+        if (Lives <= 0)
+        {
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(loseSceneName);
+            return;
+        }
+
         Vector3 pos = respawnPoint ? respawnPoint.position : spawnPos;
         Quaternion rot = respawnPoint ? respawnPoint.rotation : spawnRot;
 
-        // FIRST: make it dynamic so we are allowed to edit velocity
         rb.isKinematic = false;
         rb.useGravity = false;
 
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
 
-        // THEN freeze physics again
         rb.isKinematic = true;
 
         transform.SetPositionAndRotation(pos, rot);
@@ -276,7 +305,6 @@ public class Movement : MonoBehaviour
 
     private void GetCapsulePoints(Vector3 atPos, out Vector3 p1, out Vector3 p2, out float radius)
     {
-        // Prefer an actual CapsuleCollider (recommended you add one to the Player root)
         CapsuleCollider cap = GetComponent<CapsuleCollider>();
 
         if (cap != null)
@@ -293,10 +321,9 @@ public class Movement : MonoBehaviour
             return;
         }
 
-        // Fallback: use agent dimensions (better than hard-coded defaults)
         radius = agent.radius;
         float h = agent.height;
-        float centerAgentY = agent.baseOffset; // commonly equals height/2 when pivot at feet
+        float centerAgentY = agent.baseOffset;
 
         float cylinder2 = Mathf.Max(0f, h - 2f * radius);
         Vector3 center2 = atPos + Vector3.up * centerAgentY;
@@ -342,7 +369,6 @@ public class Movement : MonoBehaviour
     {
         Vector3 pos = transform.position;
 
-        // Snap down onto ground if there is ground underneath (prevents hovering after arc)
         Vector3 origin = pos + Vector3.up * 2f;
         if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, 5f, Ground, QueryTriggerInteraction.Ignore))
         {
@@ -355,7 +381,7 @@ public class Movement : MonoBehaviour
                 float scaledRadius = cap.radius * transform.lossyScale.y;
 
                 float half = scaledHeight * 0.5f;
-                bottomOffset = half - scaledRadius;  // distance from center to bottom sphere edge
+                bottomOffset = half - scaledRadius;
             }
 
             pos.y = hit.point.y + bottomOffset;
@@ -364,7 +390,6 @@ public class Movement : MonoBehaviour
 
         agent.nextPosition = transform.position;
 
-        // No platform under us -> fall
         if (!HasGroundBelow(transform.position))
         {
             BeginFall();
@@ -413,7 +438,6 @@ public class Movement : MonoBehaviour
 
             Vector3 from = transform.position;
 
-            // Sweep every frame so we cannot tunnel through walls
             if (SweepCapsule(from, desired, out Vector3 corrected))
             {
                 transform.position = corrected;
@@ -427,7 +451,6 @@ public class Movement : MonoBehaviour
             yield return null;
         }
 
-        // Land at current position (could be clamped by a wall)
         FinishManualMove();
 
         isJumping = false;
@@ -494,7 +517,6 @@ public class Movement : MonoBehaviour
 
     private void UpdateLookAndSpin()
     {
-        // ---- Update base look rotation toward mouse (yaw only) ----
         if (!isJumping && !isDashing)
         {
             Vector2 mousePos = Mouse.current.position.ReadValue();
@@ -521,13 +543,11 @@ public class Movement : MonoBehaviour
 
     private void Update()
     {
-        // Falling / respawn
         if (isFalling)
         {
             if (transform.position.y < killY)
                 Respawn();
 
-            // Optional: still rotate while falling
             UpdateLookAndSpin();
             return;
         }
