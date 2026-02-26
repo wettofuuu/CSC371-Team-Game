@@ -59,6 +59,8 @@ public class Piston : MonoBehaviour
         }
     }
 
+    private NavMeshAgent currentAgent;
+
     private IEnumerator ReenableAgent(NavMeshAgent Agent, Vector3 NewPosition){
         yield return null; 
 
@@ -66,21 +68,21 @@ public class Piston : MonoBehaviour
         Agent.enabled = true;
     }
 
+    private void OnTriggerEnter(Collider other){
+        if (other.CompareTag("Player")){
+            currentAgent = other.GetComponent<NavMeshAgent>();
+            if (currentAgent != null){
+                currentAgent.enabled = false;
+            }
+        }
+    }
+
     private void OnTriggerStay(Collider other){
         if (other.CompareTag("Player") && extending){
-            NavMeshAgent Agent = other.GetComponent<NavMeshAgent>();
+            Vector3 WorldDirection = transform.TransformDirection(Direction);
+            float PushAmount = SlamSpeed * Time.deltaTime;
 
-            if (Agent != null)
-            {
-                Agent.enabled = false;
-
-                Vector3 WorldDirection = transform.TransformDirection(Direction);
-                float PushDistance = 2f;
-
-                other.transform.position += WorldDirection * PushDistance;
-
-                StartCoroutine(ReenableAgent(Agent, other.transform.position));
-            }
+            other.transform.position += WorldDirection * PushAmount;
         }
     }
 }
