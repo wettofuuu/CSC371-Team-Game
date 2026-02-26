@@ -8,6 +8,7 @@ public class Dialogue : MonoBehaviour
     public GameObject DialogueBox;
     public TextMeshProUGUI DialogueTextbox;
     public NonPlayableMovement Npc;
+    private bool Triggered = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -25,7 +26,8 @@ public class Dialogue : MonoBehaviour
 
         DialogueBox.SetActive(false);
 
-        if (Npc != null){
+        if (Npc != null && !Triggered){
+            Triggered = true;
             Npc.MoveBack();
         }
     }
