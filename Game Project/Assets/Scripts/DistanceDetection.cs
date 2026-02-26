@@ -1,14 +1,13 @@
 using UnityEngine;
 
-
 public class DistanceDetection : MonoBehaviour
 {
-    [Header("Audio")]
-[SerializeField] private AudioSource npcAudio;
-[SerializeField] private AudioClip detectClip;
     public Transform Player;
     private bool Detected = false;
     public float DetectionRange = 5f;
+    private float ExitRange = 5f;
+    public float IdealExitRange = 3f;
+    public bool ChangeRange = true;
     public DialogueData NpcDialogue;
 
     public Dialogue DialogueScript;
@@ -23,21 +22,22 @@ public class DistanceDetection : MonoBehaviour
     {
         float Distance = Vector3.Distance(transform.position, Player.position);
 
-        if (!Detected && Distance <= DetectionRange){
-            Detect();
+        if (!Detected && Distance <= DetectionRange)
+        {
+            Detected = true;
+
+            if (ChangeRange){
+                DetectionRange = 2f;
+                ExitRange = IdealExitRange;
+            }
+
+            DialogueScript.DialogueTrigger(NpcDialogue.DialogueLines[0]);
         }
-    }
 
-    void Detect(){
-        Detected = true;
-
-    if (npcAudio != null && detectClip != null)
-    {
-        npcAudio.PlayOneShot(detectClip);
-    }
-
-        for (int i = 0; i < NpcDialogue.DialogueLines.Length; i++){
-            DialogueScript.DialogueTrigger(NpcDialogue.DialogueLines[i]);
+        if (Detected && Distance > ExitRange && !DialogueScript.DialogueBox.activeSelf)
+        {
+            Detected = false;
+            DialogueScript.DialogueBox.SetActive(false);
         }
     }
 }
