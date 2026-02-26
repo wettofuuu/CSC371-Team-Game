@@ -19098,15 +19098,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2901947324754720540, guid: 83b5452fa9531450dafdbbce25919f51, type: 3}
       propertyPath: m_Height
-      value: 1
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 2901947324754720540, guid: 83b5452fa9531450dafdbbce25919f51, type: 3}
       propertyPath: m_Radius
-      value: 0.5
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 2901947324754720540, guid: 83b5452fa9531450dafdbbce25919f51, type: 3}
       propertyPath: m_Center.y
-      value: 0.5
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 2902680027644734259, guid: 83b5452fa9531450dafdbbce25919f51, type: 3}
       propertyPath: Camera
@@ -19124,12 +19124,13 @@ PrefabInstance:
       propertyPath: footstepSource
       value: 
       objectReference: {fileID: 353178905}
-      propertyPath: respawnPoint
-      value: 
-      objectReference: {fileID: 1927830360}
     - target: {fileID: 4628650025900636241, guid: 83b5452fa9531450dafdbbce25919f51, type: 3}
       propertyPath: m_Height
-      value: 1
+      value: 0.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 4628650025900636241, guid: 83b5452fa9531450dafdbbce25919f51, type: 3}
+      propertyPath: m_Radius
+      value: 0.28
       objectReference: {fileID: 0}
     - target: {fileID: 8149329602949067404, guid: 83b5452fa9531450dafdbbce25919f51, type: 3}
       propertyPath: m_LocalPosition.x
