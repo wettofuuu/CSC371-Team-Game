@@ -16,6 +16,7 @@ public class Movement : MonoBehaviour
     public LayerMask Ground;
 
     [Header("Lives")]
+    [SerializeField] private string livesTextTag = "LivesText";
     [SerializeField] private TMP_Text livesText;          // drag your TMP text here
     [SerializeField] private string loseSceneName = "LoseScene";
     public static int Lives { get; private set; } = 9;    // persists across scenes (static)
@@ -81,16 +82,73 @@ public class Movement : MonoBehaviour
     public void EnableDash() => CanDash = true;
 
     // Call this when starting a NEW GAME (ex: MainMenu Play button)
+
+    public void UpdateLivesUI()
+    {
+        // Try to use the inspector-assigned TMP if available
+        if (livesText != null)
+        {
+            livesText.text = $"Lives: {Lives}";
+            return;
+        }
+
+        // Otherwise try to find the on-screen text by tag (works if UI persists or is in current scene)
+        GameObject go = GameObject.FindGameObjectWithTag("LivesText");
+        if (go != null)
+        {
+            TMP_Text txt = go.GetComponent<TMP_Text>();
+            if (txt != null)
+                txt.text = $"Lives: {Lives}";
+        }
+    }
+
+    // ResetLives now updates UI immediately (if present) and also notifies any existing Movement instances
     public static void ResetLives()
     {
         Lives = 9;
         livesInitialized = true;
+
+        // Update any Movement instances' UI (in-case player object exists)
+        Movement[] players = Object.FindObjectsOfType<Movement>();
+        foreach (var p in players)
+        {
+            p.UpdateLivesUI();
+        }
+
+        // Also update the persistent UI (if the canvas exists now)
+        GameObject go = GameObject.FindGameObjectWithTag("LivesText");
+        if (go != null)
+        {
+            TMP_Text txt = go.GetComponent<TMP_Text>();
+            if (txt != null)
+                txt.text = $"Lives: {Lives}";
+        }
     }
 
-    private void UpdateLivesUI()
+    // Hook scene loading so UI will rebind after a scene change
+    private void OnEnable()
     {
-        if (livesText != null)
-            livesText.text = $"Lives: {Lives}";
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Try to re-hook the lives text and refresh it when a new scene finishes loading
+        UpdateLivesUI();
+    }
+
+    private void TryHookLivesText()
+    {
+        if (livesText != null) return;
+
+        GameObject go = GameObject.FindGameObjectWithTag(livesTextTag);
+        if (go != null)
+            livesText = go.GetComponent<TMP_Text>();
     }
 
     private void Awake()
@@ -150,12 +208,36 @@ public class Movement : MonoBehaviour
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = Camera.ScreenPointToRay(mousePos);
 
-        if (Physics.Raycast(ray, out RaycastHit hit, 200f, Ground, QueryTriggerInteraction.Ignore))
+        // IMPORTANT: Collide so trigger box is detected
+        if (Physics.Raycast(ray, out RaycastHit hit, 200f, Ground, QueryTriggerInteraction.Collide))
         {
-            if (NavMesh.SamplePosition(hit.point, out NavMeshHit navHit, 2.0f, NavMesh.AllAreas))
+            // 🔹 If we clicked the NavMeshLink clickable area
+            if (hit.collider != null && hit.collider.CompareTag("NavLinkArea"))
+            {
+                NavLinkAreaMarker marker = hit.collider.GetComponentInParent<NavLinkAreaMarker>();
+
+                if (marker != null)
+                {
+                    Vector3 endpoint;
+
+                    // Choose the FAR endpoint so we always cross the bridge
+                    if (marker.GetFarEndpointPosition(transform.position, out endpoint))
+                    {
+                        if (NavMesh.SamplePosition(endpoint, out NavMeshHit navHit, 2.0f, NavMesh.AllAreas))
+                        {
+                            agent.isStopped = false;
+                            agent.SetDestination(navHit.position);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // 🔹 Normal ground click movement
+            if (NavMesh.SamplePosition(hit.point, out NavMeshHit navHit2, 2.0f, NavMesh.AllAreas))
             {
                 agent.isStopped = false;
-                agent.SetDestination(navHit.position);
+                agent.SetDestination(navHit2.position);
             }
         }
     }
