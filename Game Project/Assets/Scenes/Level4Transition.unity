@@ -997,7 +997,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f5bba3a324824c439233db27ee6297d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AutoLoadNextScene
-  nextSceneName: TempDash
+  nextSceneName: Level4Design
   delay: 1.5
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
