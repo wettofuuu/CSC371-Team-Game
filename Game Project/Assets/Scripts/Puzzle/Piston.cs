@@ -10,6 +10,7 @@ public class Piston : MonoBehaviour
     public float SlamSpeed = 25f;
     public float RetractSpeed = 20f;
     public float WaitTime = 1f;
+    public float PlayerForce = 15f;
 
     private Vector3 startPos;
     private float currentTravel = 0f;
@@ -17,6 +18,8 @@ public class Piston : MonoBehaviour
     private bool extending = false;
     private bool retracting = false;
     private float waitTimer;
+
+    private PlayerKnockback PlayerInside;
 
     void Start(){
         startPos = transform.localPosition;
@@ -27,8 +30,10 @@ public class Piston : MonoBehaviour
     void Update(){
         if (!extending && !retracting){
             waitTimer -= Time.deltaTime;
+
             if (waitTimer <= 0f){
                 extending = true;
+                TryPushPlayer();
             }
         }
 
@@ -59,30 +64,18 @@ public class Piston : MonoBehaviour
         }
     }
 
-    private NavMeshAgent currentAgent;
-
-    private IEnumerator ReenableAgent(NavMeshAgent Agent, Vector3 NewPosition){
-        yield return null; 
-
-        Agent.Warp(NewPosition);
-        Agent.enabled = true;
-    }
-
-    private void OnTriggerEnter(Collider other){
-        if (other.CompareTag("Player")){
-            currentAgent = other.GetComponent<NavMeshAgent>();
-            if (currentAgent != null){
-                currentAgent.enabled = false;
-            }
-        }
-    }
-
     private void OnTriggerStay(Collider other){
-        if (other.CompareTag("Player") && extending){
-            Vector3 WorldDirection = transform.TransformDirection(Direction);
-            float PushAmount = SlamSpeed * Time.deltaTime;
+        if (!other.CompareTag("Player")) return;
 
-            other.transform.position += WorldDirection * PushAmount;
-        }
+        PlayerInside = other.GetComponentInParent<PlayerKnockback>();
+    }
+
+    private void TryPushPlayer(){   
+        if (PlayerInside == null) return;
+
+        Vector3 worldDirection = transform.TransformDirection(Direction);
+        PlayerInside.ApplyKnockback(worldDirection * PlayerForce);
+
+        PlayerInside = null;
     }
 }
