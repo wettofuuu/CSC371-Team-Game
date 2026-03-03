@@ -18909,6 +18909,14 @@ PrefabInstance:
       propertyPath: Camera
       value: 
       objectReference: {fileID: 330585545}
+    - target: {fileID: 8827651533265007621, guid: 19be689e5f4b318438cb2260f21dae0c, type: 3}
+      propertyPath: sfxSource
+      value: 
+      objectReference: {fileID: 1878495783}
+    - target: {fileID: 8827651533265007621, guid: 19be689e5f4b318438cb2260f21dae0c, type: 3}
+      propertyPath: footstepSource
+      value: 
+      objectReference: {fileID: 353178905}
     - target: {fileID: 2901947324754720540, guid: 83b5452fa9531450dafdbbce25919f51, type: 3}
       propertyPath: m_Height
       value: 0.7
