@@ -5,6 +5,11 @@ using UnityEngine.AI;
 [RequireComponent(typeof(Rigidbody))]
 public class SpinPushBlock : MonoBehaviour, IPushableBlock
 {
+    [Header("Respawn (when dropped)")]
+    public bool respawnWhenDropped = true;
+    public float respawnDelay = 0.1f;     
+    public Transform respawnPoint;    
+       
     [Header("Grid Move")]
     public float gridStep = 1f;            // tile size
     public float moveTime = 0.15f;         // time to shove 1 tile
@@ -25,6 +30,9 @@ public class SpinPushBlock : MonoBehaviour, IPushableBlock
     private NavMeshObstacle obstacle;
     private float startY;
     private AudioSource audioSource;
+    private Vector3 startPos;
+    private Quaternion startRot;
+    private bool respawning = false;
 
     void Awake()
     {
@@ -40,6 +48,8 @@ public class SpinPushBlock : MonoBehaviour, IPushableBlock
 
         obstacle = GetComponent<NavMeshObstacle>();
         startY = transform.position.y;
+        startPos = transform.position;
+        startRot = transform.rotation;
 
         // If you use a NavMeshObstacle on the block, carve ONLY when stationary.
         if (obstacle != null)
@@ -124,6 +134,11 @@ public class SpinPushBlock : MonoBehaviour, IPushableBlock
 
         // If it dropped into the pit, keep obstacle OFF forever (so it doesn't carve bridge/navmesh/link)
         bool droppedIntoPit = transform.position.y < (startY - droppedYDelta);
+        if (droppedIntoPit && respawnWhenDropped && !respawning)
+        {
+            StartCoroutine(RespawnRoutine());
+            yield break; // end this moving logic
+        }
 
         if (obstacle != null)
             obstacle.enabled = !droppedIntoPit;
@@ -154,4 +169,50 @@ public class SpinPushBlock : MonoBehaviour, IPushableBlock
     {
         return Mathf.Round(value / step) * step;
     }
+    IEnumerator RespawnRoutine()
+{
+    respawning = true;
+    moving = true; // stop player to push 
+
+    
+    if (obstacle != null) obstacle.enabled = false;
+
+    
+    rb.linearVelocity = Vector3.zero;
+    rb.angularVelocity = Vector3.zero;
+
+    
+    if (respawnDelay > 0f)
+        yield return new WaitForSeconds(respawnDelay);
+    else
+        yield return null;
+
+    
+    Vector3 pos = startPos;
+    Quaternion rot = startRot;
+    if (respawnPoint != null)
+    {
+        pos = respawnPoint.position;
+        rot = respawnPoint.rotation;
+    }
+
+    rb.position = pos;
+    rb.rotation = rot;
+    rb.Sleep();
+    rb.WakeUp();
+
+    
+    startY = pos.y;
+
+    
+    if (obstacle != null)
+    {
+        obstacle.enabled = true;
+        obstacle.carving = true;
+        obstacle.carveOnlyStationary = true;
+    }
+
+    moving = false;
+    respawning = false;
+}
 }
