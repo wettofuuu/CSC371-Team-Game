@@ -18914,6 +18914,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1878495783}
     - target: {fileID: 8827651533265007621, guid: 19be689e5f4b318438cb2260f21dae0c, type: 3}
+      propertyPath: Ground.m_Bits
+      value: 584
+      objectReference: {fileID: 0}
+    - target: {fileID: 8827651533265007621, guid: 19be689e5f4b318438cb2260f21dae0c, type: 3}
       propertyPath: footstepSource
       value: 
       objectReference: {fileID: 353178905}
