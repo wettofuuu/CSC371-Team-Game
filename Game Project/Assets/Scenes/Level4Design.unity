@@ -6550,6 +6550,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3758216642196295684, guid: 262010ba634ba1349bf5b6d1401e62e4, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6596161484288406753, guid: 262010ba634ba1349bf5b6d1401e62e4, type: 3}
       propertyPath: m_Name
       value: MovableBlock
