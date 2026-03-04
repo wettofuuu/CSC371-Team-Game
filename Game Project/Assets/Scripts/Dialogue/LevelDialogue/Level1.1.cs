@@ -6,7 +6,7 @@ public class Level11 : DialogueData
     {
         DialogueLines = new string[]
         {
-            "MUAHAHAHA! YOU WILL NEVER BE ABLE TO ESCAPE FAT TOM'S MAZE! I HAVE TRAPPED YOU HERE FOREVER!",
+            "I am a traveler trying to get past. Hmmm can you help me form a bridge down there so I can pass?",
         };
     }
 }

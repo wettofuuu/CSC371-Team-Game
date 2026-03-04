@@ -41,9 +41,6 @@ public class Movement : MonoBehaviour
     private bool Spinning;
     public bool IsSpinning => Spinning;
     public float LastSpinTime { get; private set; } = -999f;
-    private Vector3 clickTarget;
-    private Vector3 moveDirection;
-    private bool playerMoving = false;
 
     // ================= AUDIO =================
 [Header("Audio Sources")]
@@ -104,28 +101,6 @@ public class Movement : MonoBehaviour
                 txt.text = $"Lives: {Lives}";
         }
     }
-    
-    private bool IsWallInFront(float stepDistance)
-{
-    Vector3 origin = transform.position + Vector3.up * 0.5f;
-
-    if (Physics.Raycast(
-        origin,
-        moveDirection,
-        out RaycastHit hit,
-        stepDistance + 0.05f,
-        ~0, // ALL layers
-        QueryTriggerInteraction.Ignore))
-    {
-        // Ignore hitting ourselves
-        if (hit.collider.transform.root == transform)
-            return false;
-
-        return true; // Hit something → stop
-    }
-
-    return false;
-}
 
     // ResetLives now updates UI immediately (if present) and also notifies any existing Movement instances
     public static void ResetLives()
@@ -189,8 +164,6 @@ public class Movement : MonoBehaviour
         agent.autoBraking = true;
         agent.acceleration = 12f;
         agent.angularSpeed = 720f;
-        agent.updateRotation = false;
-        agent.autoBraking = false;
 
         agent.autoTraverseOffMeshLink = false;
 
@@ -226,7 +199,8 @@ public class Movement : MonoBehaviour
         StartCoroutine(StopSpinAfterDelay(0.15f));
     }
 
-    private void OnMoveClick(InputValue value){
+    private void OnMoveClick(InputValue value)
+    {
         if (!value.isPressed) return;
         if (isJumping || isDashing || isFalling) return;
         if (!agent.enabled) return;
@@ -234,17 +208,37 @@ public class Movement : MonoBehaviour
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = Camera.ScreenPointToRay(mousePos);
 
+        // IMPORTANT: Collide so trigger box is detected
         if (Physics.Raycast(ray, out RaycastHit hit, 200f, Ground, QueryTriggerInteraction.Collide))
         {
-            clickTarget = hit.point;
-            clickTarget.y = transform.position.y;
+            // 🔹 If we clicked the NavMeshLink clickable area
+            if (hit.collider != null && hit.collider.CompareTag("NavLinkArea"))
+            {
+                NavLinkAreaMarker marker = hit.collider.GetComponentInParent<NavLinkAreaMarker>();
 
-            moveDirection = (clickTarget - transform.position).normalized;
+                if (marker != null)
+                {
+                    Vector3 endpoint;
 
-            playerMoving = true;
+                    // Choose the FAR endpoint so we always cross the bridge
+                    if (marker.GetFarEndpointPosition(transform.position, out endpoint))
+                    {
+                        if (NavMesh.SamplePosition(endpoint, out NavMeshHit navHit, 2.0f, NavMesh.AllAreas))
+                        {
+                            agent.isStopped = false;
+                            agent.SetDestination(navHit.position);
+                            return;
+                        }
+                    }
+                }
+            }
 
-            agent.ResetPath();     
-            agent.isStopped = true;
+            // 🔹 Normal ground click movement
+            if (NavMesh.SamplePosition(hit.point, out NavMeshHit navHit2, 2.0f, NavMesh.AllAreas))
+            {
+                agent.isStopped = false;
+                agent.SetDestination(navHit2.position);
+            }
         }
     }
 
@@ -644,21 +638,6 @@ public class Movement : MonoBehaviour
             agent.speed = MoveSpeed;
 
         UpdateLookAndSpin();
-
-        if (playerMoving && agent.enabled && !isJumping && !isDashing){
-            if (Vector3.Distance(transform.position, clickTarget) < 0.05f){
-                playerMoving = false;
-            } else {
-                Vector3 step = moveDirection * MoveSpeed * Time.deltaTime;
-
-                if (IsWallInFront(step.magnitude)){
-                    playerMoving = false;
-                    return;
-                }
-
-                agent.Move(step);
-            }
-        }
     // -------- FOOTSTEP AUDIO --------
     if (footstepSource != null && agent.enabled && !isJumping && !isDashing && !isFalling)
     {
