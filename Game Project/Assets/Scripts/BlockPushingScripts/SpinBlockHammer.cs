@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class SpinToPush_More : MonoBehaviour
+public class SpinBlockHammer : MonoBehaviour
 {
     [Header("Grid / Movement")]
     public float gridStep = 1f;
@@ -178,10 +178,8 @@ public class SpinToPush_More : MonoBehaviour
         return Mathf.Round(value / step) * step;
     }
 
-    /// <summary>
     /// Returns true if the block can fit at targetPos (ignores triggers).
     /// Uses the block's collider bounds as the test size (slightly reduced).
-    /// </summary>
     private bool IsSpaceFree(Vector3 targetPos)
     {
         Collider col = GetComponent<Collider>();
@@ -203,9 +201,7 @@ public class SpinToPush_More : MonoBehaviour
         return true;
     }
 
-    /// <summary>
     /// Improved support check: center + 4 corners. If any ray hits support layers, consider supported.
-    /// </summary>
     private bool HasSupportUnderneath()
     {
         Collider col = GetComponent<Collider>();
