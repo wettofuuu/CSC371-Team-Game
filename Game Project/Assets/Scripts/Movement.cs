@@ -30,6 +30,16 @@ public class Movement : MonoBehaviour
     [SerializeField] private float killY = -20f;
     [SerializeField] private Transform respawnPoint; // optional
 
+    [Header("Stun / Knockback")]
+    [SerializeField] private float stunDuration = 1.0f;
+
+    [Header("Stun VFX / SFX")]
+    [SerializeField] private GameObject stunVFX;
+    [SerializeField] private AudioClip stunClip;
+
+    private bool isStunned = false;
+    private float stunEndTime = -999f;
+
     private NavMeshAgent agent;
     private Rigidbody rb;
 
@@ -43,16 +53,16 @@ public class Movement : MonoBehaviour
     public float LastSpinTime { get; private set; } = -999f;
 
     // ================= AUDIO =================
-[Header("Audio Sources")]
-[SerializeField] private AudioSource footstepSource;   // looping
-[SerializeField] private AudioSource sfxSource;        // one-shot sounds
+    [Header("Audio Sources")]
+    [SerializeField] private AudioSource footstepSource;   // looping
+    [SerializeField] private AudioSource sfxSource;        // one-shot sounds
 
-[Header("Audio Clips")]
-[SerializeField] private AudioClip jumpClip;
-[SerializeField] private AudioClip dashClip;
-[SerializeField] private AudioClip furballClip;
-[SerializeField] private AudioClip landClip;
-[SerializeField] private AudioClip fallClip;
+    [Header("Audio Clips")]
+    [SerializeField] private AudioClip jumpClip;
+    [SerializeField] private AudioClip dashClip;
+    [SerializeField] private AudioClip furballClip;
+    [SerializeField] private AudioClip landClip;
+    [SerializeField] private AudioClip fallClip;
 
     [Header("Jump Settings")]
     [SerializeField] private float jumpDistance = 3f;
@@ -182,6 +192,9 @@ public class Movement : MonoBehaviour
             livesInitialized = true;
         }
         UpdateLivesUI();
+
+        // Ensure stun VFX starts hidden
+        if (stunVFX != null) stunVFX.SetActive(false);
     }
 
     private IEnumerator StopSpinAfterDelay(float delay)
@@ -193,6 +206,7 @@ public class Movement : MonoBehaviour
     private void OnSpin(InputValue value)
     {
         if (!value.isPressed) return;
+        if (isStunned) return;
 
         Spinning = true;
         LastSpinTime = Time.time;
@@ -202,6 +216,7 @@ public class Movement : MonoBehaviour
     private void OnMoveClick(InputValue value)
     {
         if (!value.isPressed) return;
+        if (isStunned) return;
         if (isJumping || isDashing || isFalling) return;
         if (!agent.enabled) return;
 
@@ -245,36 +260,43 @@ public class Movement : MonoBehaviour
     private void OnJump(InputValue value)
     {
         if (!value.isPressed) return;
+        if (isStunned) return;
         if (!CanJump) return;
         if (isJumping || isDashing || isFalling) return;
         if (traversingLink) return;
         if (!agent.enabled) return;
+
         if (sfxSource && jumpClip)
-        sfxSource.PlayOneShot(jumpClip);
+            sfxSource.PlayOneShot(jumpClip);
+
         StartCoroutine(JumpForwardArc_Swept());
     }
 
     private void OnDash(InputValue value)
     {
         if (!value.isPressed) return;
+        if (isStunned) return;
         if (!CanDash) return;
         if (isDashing || isJumping || isFalling) return;
         if (traversingLink) return;
         if (!agent.enabled) return;
         if (Time.time < lastDashTime + dashCooldown) return;
-        
+
         if (sfxSource && dashClip)
-        sfxSource.PlayOneShot(dashClip);
+            sfxSource.PlayOneShot(dashClip);
+
         StartCoroutine(DashPounce_Swept());
     }
 
     private void OnFurball(InputValue value)
     {
         if (!value.isPressed) return;
+        if (isStunned) return;
         if (Furball == null) return;
 
         if (sfxSource && furballClip)
-        sfxSource.PlayOneShot(furballClip);
+            sfxSource.PlayOneShot(furballClip);
+
         StartCoroutine(SpitFurball());
     }
 
@@ -332,6 +354,11 @@ public class Movement : MonoBehaviour
         Spinning = false;
         spinYaw = 0f;
 
+        // Clear stun visuals/state on fall
+        if (stunVFX != null) stunVFX.SetActive(false);
+        isStunned = false;
+        stunEndTime = -999f;
+
         if (agent.enabled)
         {
             agent.ResetPath();
@@ -345,12 +372,61 @@ public class Movement : MonoBehaviour
         rb.useGravity = true;
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
+
         if (sfxSource && fallClip)
-        sfxSource.PlayOneShot(fallClip);
+            sfxSource.PlayOneShot(fallClip);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (isFalling) return;
+
+        if (collision.collider != null && collision.collider.CompareTag("Piston"))
+        {
+            TriggerStun();
+        }
+    }
+
+    private void TriggerStun()
+    {
+        bool wasStunned = isStunned;
+
+        isStunned = true;
+        stunEndTime = Time.time + stunDuration;
+
+        if (stunVFX != null) stunVFX.SetActive(true);
+
+        if (!wasStunned && sfxSource != null && stunClip != null)
+            sfxSource.PlayOneShot(stunClip);
+
+        if (agent != null && agent.enabled)
+        {
+            agent.ResetPath();
+            agent.isStopped = true;
+        }
+
+        if (footstepSource != null && footstepSource.isPlaying)
+            footstepSource.Pause();
+    }
+
+    private void ClearStun()
+    {
+        isStunned = false;
+
+        if (stunVFX != null) stunVFX.SetActive(false);
+
+        if (agent != null && agent.enabled)
+        {
+            agent.isStopped = false;
+        }
     }
 
     private void Respawn()
     {
+        if (stunVFX != null) stunVFX.SetActive(false);
+        isStunned = false;
+        stunEndTime = -999f;
+
         // --- Lose a life on every respawn ---
         Lives--;
         UpdateLivesUI();
@@ -634,26 +710,38 @@ public class Movement : MonoBehaviour
             return;
         }
 
+        if (isStunned)
+        {
+            UpdateLookAndSpin();
+
+            if (Time.time >= stunEndTime)
+                ClearStun();
+
+            return;
+        }
+
         if (agent.enabled && agent.speed != MoveSpeed)
             agent.speed = MoveSpeed;
 
         UpdateLookAndSpin();
-    // -------- FOOTSTEP AUDIO --------
-    if (footstepSource != null && agent.enabled && !isJumping && !isDashing && !isFalling)
-    {
-        bool moving = agent.velocity.magnitude > 0.1f;
 
-        if (moving)
+        // -------- FOOTSTEP AUDIO --------
+        if (footstepSource != null && agent.enabled && !isJumping && !isDashing && !isFalling)
         {
-            if (!footstepSource.isPlaying)
-                footstepSource.Play();
+            bool moving = agent.velocity.magnitude > 0.1f;
+
+            if (moving)
+            {
+                if (!footstepSource.isPlaying)
+                    footstepSource.Play();
+            }
+            else
+            {
+                if (footstepSource.isPlaying)
+                    footstepSource.Pause();
+            }
         }
-        else
-        {
-            if (footstepSource.isPlaying)
-                footstepSource.Pause();
-        }
-    }
+
         if (agent.enabled && agent.isOnOffMeshLink && !traversingLink && !isJumping && !isDashing)
             StartCoroutine(TraverseLink());
     }
