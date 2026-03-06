@@ -11,6 +11,8 @@ public class Piston : MonoBehaviour
     public float RetractSpeed = 20f;
     public float WaitTime = 1f;
     public float PlayerForce = 15f;
+    public bool PlayerDeath = false;
+    public float DeathDelay = 2f;
 
     private Vector3 startPos;
     private float currentTravel = 0f;
@@ -87,12 +89,28 @@ public class Piston : MonoBehaviour
         PlayerInside = null;
     }
 
+    private IEnumerator RespawnAfterDelay(PlayerKnockback Player){
+        yield return new WaitForSeconds(DeathDelay);
+
+        if (Player == null) yield break;
+
+        Movement Movement = Player.GetComponentInParent<Movement>();
+        if (Movement != null){
+            Movement.Respawn();
+        }
+    }
+
     private void TryPushPlayer(){
         if (!CanPush) return;
         if (PlayerInside == null) return;
 
         Vector3 worldDirection = transform.TransformDirection(Direction);
+        PlayerInside.transform.position += Vector3.up * 0.05f;
         PlayerInside.ApplyKnockback(worldDirection * PlayerForce);
+
+        if (PlayerDeath){
+            StartCoroutine(RespawnAfterDelay(PlayerInside));
+        }
 
         CanPush = false;
         PlayerInside = null;

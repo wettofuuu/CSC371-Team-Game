@@ -341,6 +341,35 @@ public class Movement : MonoBehaviour
         return Physics.Raycast(origin, Vector3.down, maxDistance, Ground, QueryTriggerInteraction.Ignore);
     }
 
+    private void EndFall(Vector3 navPosition){
+        isFalling = false;
+
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        rb.useGravity = false;
+        rb.isKinematic = true;
+
+        agent.enabled = true;
+        agent.Warp(navPosition);
+        agent.updatePosition = true;
+        agent.updateRotation = true;
+        agent.isStopped = false;
+    }
+
+    private void CheckForLanding(){
+        if (!isFalling) return;
+
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, 1.2f)){
+            NavMeshHit navHit;
+
+            if (NavMesh.SamplePosition(hit.point, out navHit, 1.0f, NavMesh.AllAreas)){
+                EndFall(navHit.position);
+            }
+        }
+    }
+
     private void BeginFall()
     {
         if (isFalling) return;
@@ -421,7 +450,7 @@ public class Movement : MonoBehaviour
         }
     }
 
-    private void Respawn()
+    public void Respawn()
     {
         if (stunVFX != null) stunVFX.SetActive(false);
         isStunned = false;
@@ -705,6 +734,8 @@ public class Movement : MonoBehaviour
         {
             if (transform.position.y < killY)
                 Respawn();
+
+            CheckForLanding(); 
 
             UpdateLookAndSpin();
             return;
