@@ -6,7 +6,7 @@ public class Level11 : DialogueData
     {
         DialogueLines = new string[]
         {
-            "I am a traveler trying to get past. Hmmm can you help me form a bridge down there so I can pass?",
+            "I am a traveler trying to get past. Hmmm can you help me form a bridge down there so I can pass? You can only trigger two levers at a time.",
         };
     }
 }

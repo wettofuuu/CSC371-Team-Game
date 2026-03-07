@@ -8,6 +8,9 @@ TagManager:
   - NavLinkArea
   - LivesText
   - Piston
+  - BarrierA
+  - BarrierB
+  - BarrierC
   layers:
   - Default
   - TransparentFX
