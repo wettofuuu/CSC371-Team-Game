@@ -7309,6 +7309,10 @@ PrefabInstance:
       propertyPath: respawnPoint
       value: 
       objectReference: {fileID: 337815908}
+    - target: {fileID: 8827651533265007621, guid: 19be689e5f4b318438cb2260f21dae0c, type: 3}
+      propertyPath: footstepSource
+      value: 
+      objectReference: {fileID: 2031472080}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -8963,7 +8967,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: bf0ea3f86234fea4fa12a63a11e2771e, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1

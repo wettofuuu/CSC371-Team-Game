@@ -35,7 +35,7 @@ public class LeverOpenBarrierA : MonoBehaviour
         for (int i = 0; i < doors.Length; i++)
         {
             doorDownPositions[i] = doors[i].transform.position;
-            doorUpPositions[i] = doorDownPositions[i] + new Vector3(0, moveUpAmount, 0);
+            doorUpPositions[i] = doorDownPositions[i] + new Vector3(0, -moveUpAmount, 0);
         }
     }
 
@@ -56,7 +56,7 @@ public class LeverOpenBarrierA : MonoBehaviour
     {
         isMoving = true;
 
-        // Prevent raising if already 2 raised
+        // If we're about to LOWER (your "raise") and already at max, block
         if (!isUp && raisedLeverCount >= MAX_RAISED)
         {
             Debug.Log("Maximum raised barriers reached.");
@@ -64,12 +64,15 @@ public class LeverOpenBarrierA : MonoBehaviour
             yield break;
         }
 
+        // Reserve immediately so other levers can't also start
+        if (!isUp)
+            raisedLeverCount++;
+
         yield return StartCoroutine(AnimateLever());
 
         Vector3[] targets = isUp ? doorDownPositions : doorUpPositions;
 
         bool doorsMoving = true;
-
         while (doorsMoving)
         {
             doorsMoving = false;
@@ -85,7 +88,6 @@ public class LeverOpenBarrierA : MonoBehaviour
                         targets[i],
                         doorMoveSpeed * Time.deltaTime
                     );
-
                     doorsMoving = true;
                 }
             }
@@ -93,11 +95,9 @@ public class LeverOpenBarrierA : MonoBehaviour
             yield return null;
         }
 
-        // Update shared counter
+        // If we're returning to the "down" state, free the slot
         if (isUp)
             raisedLeverCount--;
-        else
-            raisedLeverCount++;
 
         isUp = !isUp;
         isMoving = false;
