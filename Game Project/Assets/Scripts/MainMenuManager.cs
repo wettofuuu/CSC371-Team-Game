@@ -41,6 +41,9 @@ public class MainMenuController : MonoBehaviour
     {
         Time.timeScale = 1f;
         Movement.ResetLives();
+
+        LeverOpenBarrierA.ResetForNewRun();
+
         SceneManager.LoadScene(sceneToLoad);
     }
 

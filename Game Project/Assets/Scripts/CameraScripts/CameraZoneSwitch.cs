@@ -107,7 +107,7 @@ public class CameraZoneSwitch : MonoBehaviour
     private Transform GetTargetForX(float x)
     {
         if (x < -80f) return sixthCam;   // NEW
-        if (x < -49f) return fifthCam;
+        if (x < -51f) return fifthCam;
         if (x < -43f) return fourthCam;
         if (x < -27f) return thirdCam;
         if (x < -2f)  return secondCam;

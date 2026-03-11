@@ -1,8 +1,6 @@
 using System.Collections;
 using UnityEngine;
 
-
-
 public class LeverOpenBarrierA : MonoBehaviour
 {
     [Header("Lever Animation")]
@@ -24,6 +22,13 @@ public class LeverOpenBarrierA : MonoBehaviour
     // Shared between ALL levers
     private static int raisedLeverCount = 0;
     private const int MAX_RAISED = 2;
+
+    // Call this when starting a new run (from main menu)
+    public static void ResetForNewRun()
+    {
+        raisedLeverCount = 0;
+        Debug.Log("LeverOpenBarrierA: ResetForNewRun() -> raisedLeverCount = 0");
+    }
 
     private void Start()
     {
@@ -56,10 +61,10 @@ public class LeverOpenBarrierA : MonoBehaviour
     {
         isMoving = true;
 
-        // If we're about to LOWER (your "raise") and already at max, block
+        // If we're about to RAISE and already at max, block
         if (!isUp && raisedLeverCount >= MAX_RAISED)
         {
-            Debug.Log("Maximum raised barriers reached.");
+            Debug.Log("Maximum raised barriers reached. raisedLeverCount=" + raisedLeverCount);
             isMoving = false;
             yield break;
         }
@@ -97,7 +102,7 @@ public class LeverOpenBarrierA : MonoBehaviour
 
         // If we're returning to the "down" state, free the slot
         if (isUp)
-            raisedLeverCount--;
+            raisedLeverCount = Mathf.Max(0, raisedLeverCount - 1);
 
         isUp = !isUp;
         isMoving = false;
@@ -110,17 +115,13 @@ public class LeverOpenBarrierA : MonoBehaviour
         float elapsed = 0f;
 
         Quaternion startRot = transform.localRotation;
-        Quaternion endRot;
-
-        if (!isUp)
-            endRot = startRot * Quaternion.Euler(leverRotationOffset);
-        else
-            endRot = startRot * Quaternion.Euler(-leverRotationOffset);
+        Quaternion endRot = !isUp
+            ? startRot * Quaternion.Euler(leverRotationOffset)
+            : startRot * Quaternion.Euler(-leverRotationOffset);
 
         while (elapsed < leverAnimationTime)
         {
             float t = elapsed / leverAnimationTime;
-
             transform.localRotation = Quaternion.Slerp(startRot, endRot, t);
 
             elapsed += Time.deltaTime;
@@ -128,5 +129,12 @@ public class LeverOpenBarrierA : MonoBehaviour
         }
 
         transform.localRotation = endRot;
+    }
+
+    // Safety: if the lever gets destroyed while "up", free the slot
+    private void OnDestroy()
+    {
+        if (isUp)
+            raisedLeverCount = Mathf.Max(0, raisedLeverCount - 1);
     }
 }
