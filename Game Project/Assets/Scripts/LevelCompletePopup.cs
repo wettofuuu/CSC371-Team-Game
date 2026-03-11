@@ -95,9 +95,12 @@ public class LevelCompletePopup : MonoBehaviour
     {
         Time.timeScale = 1f;
 
+        // ✅ reset timer when continuing
+        if (EndlessTimer.Instance != null)
+            EndlessTimer.Instance.ResetTimer();
+
         Debug.Log($"[Continue] nextSceneName='{nextSceneName}'");
 
-        // Validate it exists in build settings
         bool inBuild = Enumerable.Range(0, SceneManager.sceneCountInBuildSettings)
             .Select(SceneUtility.GetScenePathByBuildIndex)
             .Any(p => System.IO.Path.GetFileNameWithoutExtension(p) == nextSceneName);
@@ -110,7 +113,6 @@ public class LevelCompletePopup : MonoBehaviour
             return;
         }
 
-        // Bypass ScreenFader to test
         SceneManager.LoadScene(nextSceneName);
     }
 
