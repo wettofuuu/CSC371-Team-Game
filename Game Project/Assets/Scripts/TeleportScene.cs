@@ -1,33 +1,27 @@
-using System.Collections;
 using UnityEngine;
 
 public class TeleportScene : MonoBehaviour
 {
     [SerializeField] private ParticleSystem particleSystem;
-    public string SceneName = "Level2Transition";
+    [SerializeField] private string sceneName = "Level2Transition";
+    [SerializeField] private LevelCompletePopup popup; // drag your popup in here
 
-    private bool teleporting = false;
+    private bool triggered = false;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (teleporting) return;
+        if (triggered) return;
 
-        // Only teleport player
+        // Only trigger for player
         if (other.GetComponentInParent<Movement>() == null) return;
 
-        teleporting = true;
+        triggered = true;
 
         if (particleSystem != null)
             particleSystem.Play();
 
-        StartCoroutine(Teleport());
-    }
-
-    private IEnumerator Teleport()
-    {
-        if (ScreenFader.Instance != null)
-            yield return ScreenFader.Instance.FadeToScene(SceneName);
-        else
-            UnityEngine.SceneManagement.SceneManager.LoadScene(SceneName);
+        // Tell the popup what scene "Continue" should load, then show it
+        popup.SetNextScene(sceneName);
+        popup.Show();
     }
 }
