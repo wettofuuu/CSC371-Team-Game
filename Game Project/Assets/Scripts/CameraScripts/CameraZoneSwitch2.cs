@@ -69,10 +69,10 @@ public class CameraZoneSwitchSimple : MonoBehaviour
         float x = playerPos.x;
 
         // Z-based zones (range-based, works both directions)
-        if (z < -32f && location5 != null) return location5;
-        if (z >= -32f && z < -26f && location4 != null) return location4;
+        if (z < -35f && location5 != null) return location5;
+        if (z >= -35f && z < -26f && location4 != null) return location4;
         if (z >= -26f && z < -17f && location3 != null) return location3;
-        if (z >= -17f && z < -8.5f && location2 != null) return location2;
+        if (z >= -17f && z < -7.4f && location2 != null) return location2;
 
         // X-based zones (only if not in any of the Z zones above)
         if (x < -26f && location7 != null) return location7;
