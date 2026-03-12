@@ -1852,7 +1852,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TeleportScene
   particleSystem: {fileID: 616636217}
-  SceneName: Level2Transition
+  sceneName: Level2Transition
+  popup: {fileID: 0}
 --- !u!54 &72018042
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -23498,12 +23499,18 @@ MonoBehaviour:
   Ground:
     serializedVersion: 2
     m_Bits: 72
+  livesTextTag: LivesText
+  livesText: {fileID: 0}
+  loseSceneName: LoseScene
   Solid:
     serializedVersion: 2
     m_Bits: 128
   capsuleSkin: 0.02
   killY: -20
   respawnPoint: {fileID: 696625104}
+  stunDuration: 1
+  stunVFX: {fileID: 0}
+  stunClip: {fileID: 0}
   footstepSource: {fileID: 1564399788}
   sfxSource: {fileID: 528255288}
   jumpClip: {fileID: 8300000, guid: 27243c47f5ab76743a16d88574a1434f, type: 3}
