@@ -47,7 +47,6 @@ public class Movement : MonoBehaviour
     private Quaternion spawnRot;
 
     private bool isFalling = false;
-    [SerializeField] private RectTransform VirtualCursorRectTransform;
 
     private bool Spinning;
     public bool IsSpinning => Spinning;
@@ -81,6 +80,9 @@ public class Movement : MonoBehaviour
     public bool CanDash { get; private set; } = false;
     private bool isDashing = false;
     private float lastDashTime = -999f;
+
+    [Header("Controller")]
+    [SerializeField] private RectTransform VirtualCursorRectTransform;
 
     public GameObject Furball;
 
@@ -714,9 +716,15 @@ public class Movement : MonoBehaviour
     {
         if (!isJumping && !isDashing)
         {
-            Vector2 mousePos = Mouse.current.position.ReadValue();
-            Ray ray = Camera.ScreenPointToRay(mousePos);
-
+            Ray ray;
+            if (Gamepad.current != null){
+                Vector2 cursorScreenPos = VirtualCursorRectTransform.position;
+                ray = Camera.ScreenPointToRay(cursorScreenPos);
+            } else {
+                Vector2 mousePos = Mouse.current.position.ReadValue();
+                ray = Camera.ScreenPointToRay(mousePos);
+            }
+        
             if (Physics.Raycast(ray, out RaycastHit hit, 200f, Ground, QueryTriggerInteraction.Ignore))
             {
                 Vector3 lookPoint = hit.point;
