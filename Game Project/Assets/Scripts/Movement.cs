@@ -47,6 +47,7 @@ public class Movement : MonoBehaviour
     private Quaternion spawnRot;
 
     private bool isFalling = false;
+    [SerializeField] private RectTransform VirtualCursorRectTransform;
 
     private bool Spinning;
     public bool IsSpinning => Spinning;
@@ -86,7 +87,7 @@ public class Movement : MonoBehaviour
     private Quaternion baseLookRotation = Quaternion.identity;
     private float spinYaw = 0f;
 
-    private bool traversingLink = false;
+    private bool traversingLink = false; 
 
     public void EnableJump() => CanJump = true;
     public void EnableDash() => CanDash = true;
@@ -220,8 +221,15 @@ public class Movement : MonoBehaviour
         if (isJumping || isDashing || isFalling) return;
         if (!agent.enabled) return;
 
-        Vector2 mousePos = Mouse.current.position.ReadValue();
-        Ray ray = Camera.ScreenPointToRay(mousePos);
+        Ray ray;
+
+        if (Gamepad.current != null){
+            Vector2 cursorScreenPos = VirtualCursorRectTransform.position;
+            ray = Camera.ScreenPointToRay(cursorScreenPos);
+        } else {
+            Vector2 mousePos = Mouse.current.position.ReadValue();
+            ray = Camera.ScreenPointToRay(mousePos);
+        }
 
         // IMPORTANT: Collide so trigger box is detected
         if (Physics.Raycast(ray, out RaycastHit hit, 200f, Ground, QueryTriggerInteraction.Collide))
