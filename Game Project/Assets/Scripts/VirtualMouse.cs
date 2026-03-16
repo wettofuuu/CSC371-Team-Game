@@ -28,7 +28,7 @@ public class VirtualMouse : MonoBehaviour
         EventSystem.current.RaycastAll(data, results);
 
         foreach (RaycastResult result in results)
-        {
+        {   
             if (result.gameObject.name == "ContinueButton"){
                 LevelCompletePopup.Continue();
             } else if (result.gameObject.name == "RestartButton"){
