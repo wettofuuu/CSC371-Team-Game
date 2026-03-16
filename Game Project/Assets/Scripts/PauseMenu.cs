@@ -45,4 +45,29 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 1f;
         SceneManager.LoadScene("MainMenu"); 
     }
+
+    public void Level1(){
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("TutorialScene");
+    }
+
+    public void Level2(){
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("Level2Scene");
+    }
+
+    public void Level3(){
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("Level3Scene");
+    }
+
+    public void Level4(){
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("Level4Design");
+    }
+
+    public void Level5(){
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("FinalBossScene");
+    }
 }
