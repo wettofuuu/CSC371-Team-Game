@@ -79618,6 +79618,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VirtualMouse
   cursor: {fileID: 1894334005}
   LevelCompletePopup: {fileID: 184923773}
+  MainMenuController: {fileID: 0}
 --- !u!114 &1758603329
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -79729,7 +79730,7 @@ MonoBehaviour:
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: 4a24d77d-b405-4a0e-be4b-3225451ec017
+  m_DefaultActionMap: UI
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
 --- !u!1 &1762951845
@@ -101818,7 +101819,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4289995221210243013, guid: febcebcdc9ac1eb4aaeea4b7468e31f5, type: 3}
       propertyPath: m_Name
-      value: Canvas
+      value: PauseCanvas
       objectReference: {fileID: 0}
     - target: {fileID: 6430297379965470188, guid: febcebcdc9ac1eb4aaeea4b7468e31f5, type: 3}
       propertyPath: m_Pivot.x
