@@ -22,8 +22,8 @@ TagManager:
   - Wall
   - Ground
   - NavLinkClickable
-  - 
-  - 
+  - Enemy
+  - Piston
   - 
   - 
   - 

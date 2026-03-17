@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
@@ -9,6 +10,7 @@ public class BossAI : MonoBehaviour
     [SerializeField] private Transform arenaCenter;
     [SerializeField] private NavMeshAgent agent;
     [SerializeField] private Animator animator;
+    [SerializeField] private Rigidbody rb;
 
     [Header("Patrol")]
     [SerializeField] private float patrolRadius = 8f;
@@ -20,6 +22,9 @@ public class BossAI : MonoBehaviour
     [SerializeField] private float loseRange = 11f;
     [SerializeField] private float killRange = 1.5f;
 
+    [Header("Chase")]
+    [SerializeField] private float repathInterval = 0.15f;
+
     [Header("Attack")]
     [SerializeField] private float attackCooldown = 1.0f;
     [SerializeField] private bool loadLoseScene = false;
@@ -28,6 +33,12 @@ public class BossAI : MonoBehaviour
     [Header("Animator Parameters")]
     [SerializeField] private string speedParam = "Speed";
     [SerializeField] private string attackTrigger = "Attack";
+
+    [Header("Piston Reaction")]
+    [SerializeField] private float launchUpForce = 8f;
+    [SerializeField] private float launchAwayForce = 3f;
+    [SerializeField] private float recoverDelay = 1.1f;
+    [SerializeField] private float navMeshRecoverRadius = 4f;
 
     private enum State
     {
@@ -40,12 +51,16 @@ public class BossAI : MonoBehaviour
 
     private float patrolWaitTimer = 0f;
     private float attackTimer = 0f;
+    private float repathTimer = 0f;
     private Vector3 currentPatrolTarget;
+
+    private bool isLaunched = false;
 
     private void Awake()
     {
         if (agent == null) agent = GetComponent<NavMeshAgent>();
         if (animator == null) animator = GetComponent<Animator>();
+        if (rb == null) rb = GetComponent<Rigidbody>();
 
         if (player == null)
         {
@@ -57,37 +72,55 @@ public class BossAI : MonoBehaviour
         {
             arenaCenter = transform;
         }
+
+        if (rb != null)
+        {
+            rb.isKinematic = true;
+            rb.useGravity = true;
+        }
     }
 
     private void Start()
     {
         if (agent != null && agent.isOnNavMesh)
         {
+            // 不要让 boss 死命贴到玩家中心
+            agent.stoppingDistance = Mathf.Max(agent.stoppingDistance, killRange * 0.8f);
             PickNewPatrolPoint();
         }
     }
 
     private void Update()
     {
+        if (isLaunched) return;
         if (player == null || agent == null) return;
         if (!agent.isOnNavMesh) return;
 
         attackTimer -= Time.deltaTime;
+        repathTimer -= Time.deltaTime;
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-        // swich mode
-        if (distanceToPlayer <= killRange)
+        switch (currentState)
         {
-            currentState = State.Attack;
-        }
-        else if (distanceToPlayer <= chaseRange)
-        {
-            currentState = State.Chase;
-        }
-        else if (distanceToPlayer >= loseRange)
-        {
-            currentState = State.Patrol;
+            case State.Patrol:
+                if (distanceToPlayer <= killRange)
+                    currentState = State.Attack;
+                else if (distanceToPlayer <= chaseRange)
+                    currentState = State.Chase;
+                break;
+
+            case State.Chase:
+                if (distanceToPlayer <= killRange)
+                    currentState = State.Attack;
+                else if (distanceToPlayer >= loseRange)
+                    currentState = State.Patrol;
+                break;
+
+            case State.Attack:
+                if (distanceToPlayer > killRange)
+                    currentState = (distanceToPlayer <= chaseRange) ? State.Chase : State.Patrol;
+                break;
         }
 
         switch (currentState)
@@ -97,7 +130,7 @@ public class BossAI : MonoBehaviour
                 break;
 
             case State.Chase:
-                UpdateChase();
+                UpdateChase(distanceToPlayer);
                 break;
 
             case State.Attack:
@@ -124,11 +157,33 @@ public class BossAI : MonoBehaviour
         }
     }
 
-    private void UpdateChase()
+    private void UpdateChase(float distanceToPlayer)
     {
         patrolWaitTimer = 0f;
+
+        // 接近攻击范围时停下，不要硬挤 player
+        if (distanceToPlayer <= killRange + 0.15f)
+        {
+            agent.isStopped = true;
+            return;
+        }
+
         agent.isStopped = false;
-        agent.SetDestination(player.position);
+
+        // 不要每帧都重算路径，减少抖动
+        if (repathTimer <= 0f)
+        {
+            repathTimer = repathInterval;
+
+            if (NavMesh.SamplePosition(player.position, out NavMeshHit navHit, 1.5f, NavMesh.AllAreas))
+            {
+                agent.SetDestination(navHit.position);
+            }
+            else
+            {
+                agent.SetDestination(player.position);
+            }
+        }
     }
 
     private void UpdateAttack()
@@ -136,7 +191,6 @@ public class BossAI : MonoBehaviour
         agent.isStopped = true;
         patrolWaitTimer = 0f;
 
-        // face player
         Vector3 lookDir = player.position - transform.position;
         lookDir.y = 0f;
 
@@ -146,7 +200,6 @@ public class BossAI : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 8f);
         }
 
-        // open hit/ kill player
         if (attackTimer <= 0f)
         {
             if (animator != null && !string.IsNullOrEmpty(attackTrigger))
@@ -156,13 +209,6 @@ public class BossAI : MonoBehaviour
 
             KillPlayer();
             attackTimer = attackCooldown;
-        }
-
-        // if player leave away, stop atteck
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        if (distanceToPlayer > killRange)
-        {
-            currentState = (distanceToPlayer <= chaseRange) ? State.Chase : State.Patrol;
         }
     }
 
@@ -202,18 +248,100 @@ public class BossAI : MonoBehaviour
     {
         Debug.Log("Boss attacked / killed the player.");
 
-        // put  loss scene
         if (loadLoseScene && !string.IsNullOrEmpty(loseSceneName))
         {
             SceneManager.LoadScene(loseSceneName);
             return;
         }
 
-        // stop using player(testing)
         if (player != null)
         {
             player.gameObject.SetActive(false);
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider != null && collision.collider.CompareTag("Piston"))
+        {
+            LaunchFromPiston(collision.transform.position);
+        }
+    }
+
+    private void LaunchFromPiston(Vector3 pistonPosition)
+    {
+        if (isLaunched) return;
+        if (rb == null || agent == null) return;
+
+        isLaunched = true;
+
+        if (agent.enabled)
+        {
+            agent.ResetPath();
+            agent.isStopped = true;
+            agent.updatePosition = false;
+            agent.updateRotation = false;
+            agent.enabled = false;
+        }
+
+        rb.isKinematic = false;
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        Vector3 away = transform.position - pistonPosition;
+        away.y = 0f;
+
+        if (away.sqrMagnitude < 0.001f)
+            away = -transform.forward;
+        else
+            away.Normalize();
+
+        Vector3 launch = Vector3.up * launchUpForce + away * launchAwayForce;
+        rb.AddForce(launch, ForceMode.VelocityChange);
+
+        StartCoroutine(RecoverToNavMesh());
+    }
+
+    private IEnumerator RecoverToNavMesh()
+    {
+        yield return new WaitForSeconds(recoverDelay);
+
+        float timer = 0f;
+        while (timer < 1.5f)
+        {
+            timer += Time.deltaTime;
+
+            if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, navMeshRecoverRadius, NavMesh.AllAreas))
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                rb.isKinematic = true;
+
+                transform.position = hit.position;
+
+                agent.enabled = true;
+                agent.Warp(hit.position);
+                agent.updatePosition = true;
+                agent.updateRotation = true;
+                agent.isStopped = false;
+
+                isLaunched = false;
+                yield break;
+            }
+
+            yield return null;
+        }
+
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.isKinematic = true;
+
+        agent.enabled = true;
+        agent.updatePosition = true;
+        agent.updateRotation = true;
+        agent.isStopped = false;
+
+        isLaunched = false;
     }
 
     private void OnDrawGizmosSelected()
