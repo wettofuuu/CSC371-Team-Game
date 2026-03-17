@@ -24,18 +24,29 @@ public class CannonShooter : MonoBehaviour
     [SerializeField] private float shellLifetime = 5f;
 
     private float fireTimer = 0f;
+    private bool continuousFire = false;
 
     private void Update()
     {
-        if (target == null || rotatingPart == null || firePoint == null || shellPrefab == null)
+        if (firePoint == null || shellPrefab == null)
             return;
 
-        float distance = Vector3.Distance(transform.position, target.position);
+        bool canShootNow = true;
 
-        if (onlyShootInRange && distance > detectionRange)
+        if (target != null)
+        {
+            float distance = Vector3.Distance(transform.position, target.position);
+            canShootNow = !onlyShootInRange || distance <= detectionRange;
+
+            if (rotatingPart != null && canShootNow)
+                RotateTowardTarget();
+        }
+
+        if (!continuousFire)
             return;
 
-        RotateTowardTarget();
+        if (!canShootNow)
+            return;
 
         fireTimer += Time.deltaTime;
         if (fireTimer >= fireInterval)
@@ -47,6 +58,9 @@ public class CannonShooter : MonoBehaviour
 
     private void RotateTowardTarget()
     {
+        if (target == null || rotatingPart == null)
+            return;
+
         Vector3 direction = target.position - rotatingPart.position;
 
         if (onlyRotateOnY)
@@ -61,6 +75,17 @@ public class CannonShooter : MonoBehaviour
             targetRotation,
             rotateSpeed * Time.deltaTime
         );
+    }
+
+    public void StartContinuousFire()
+    {
+        continuousFire = true;
+        fireTimer = 0f;
+    }
+
+    public void StopContinuousFire()
+    {
+        continuousFire = false;
     }
 
     private void Shoot()
