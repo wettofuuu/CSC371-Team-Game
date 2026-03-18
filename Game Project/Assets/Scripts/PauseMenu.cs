@@ -15,11 +15,8 @@ public class PauseMenu : MonoBehaviour
         isPaused = false;
     }
 
-    void Update()
-    {
-        
-        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
+    void Update(){
+        if ((Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) || (Gamepad.current != null && Gamepad.current.startButton.wasPressedThisFrame)){
             TogglePause();
         }
     }

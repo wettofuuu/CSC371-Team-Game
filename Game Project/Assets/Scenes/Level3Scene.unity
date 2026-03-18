@@ -65242,7 +65242,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.39607844, g: 0.39607844, b: 0.39607844, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -77279,6 +77279,17 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0.5, z: 1}
   m_Center: {x: 0, y: 0.25, z: 0}
+--- !u!114 &1730629910 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4474387694046427947, guid: febcebcdc9ac1eb4aaeea4b7468e31f5, type: 3}
+  m_PrefabInstance: {fileID: 1075899611}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c82ad9f155641e04c9686fac33da7e8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PauseMenu
 --- !u!1001 &1730761775
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -78568,6 +78579,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VirtualMouse
   cursor: {fileID: 1550824240}
   LevelCompletePopup: {fileID: 1007604414}
+  MainMenuController: {fileID: 0}
+  PauseMenu: {fileID: 1730629910}
 --- !u!114 &1750170905
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -78679,7 +78692,7 @@ MonoBehaviour:
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: 4a24d77d-b405-4a0e-be4b-3225451ec017
+  m_DefaultActionMap: UI
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
 --- !u!1001 &1752298405
