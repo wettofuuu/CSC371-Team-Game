@@ -275,17 +275,6 @@
                 },
                 {
                     "name": "",
-                    "id": "aca554c0-c046-4465-8ddb-a17a30c1a36d",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Click",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "aff653c1-2895-4d43-8783-bb91c05a82fe",
                     "path": "<VirtualMouse>/leftButton",
                     "interactions": "",
