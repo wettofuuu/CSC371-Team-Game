@@ -1602,6 +1602,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: febcebcdc9ac1eb4aaeea4b7468e31f5, type: 3}
+--- !u!114 &122889344 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4474387694046427947, guid: febcebcdc9ac1eb4aaeea4b7468e31f5, type: 3}
+  m_PrefabInstance: {fileID: 122889343}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c82ad9f155641e04c9686fac33da7e8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PauseMenu
 --- !u!1001 &122938032
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5855,6 +5866,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VirtualMouse
   cursor: {fileID: 554175930}
   LevelCompletePopup: {fileID: 7470514691185953210}
+  MainMenuController: {fileID: 0}
+  PauseMenu: {fileID: 122889344}
 --- !u!114 &358449084
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13549,7 +13562,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.39607844, g: 0.39607844, b: 0.39607844, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

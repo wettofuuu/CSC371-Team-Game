@@ -8,6 +8,7 @@ public class VirtualMouse : MonoBehaviour
     public GameObject cursor;
     public LevelCompletePopup LevelCompletePopup;
     public MainMenuController MainMenuController;
+    public PauseMenu PauseMenu;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start(){
@@ -39,6 +40,20 @@ public class VirtualMouse : MonoBehaviour
                 MainMenuController.Play();
             } else if (result.gameObject.name == "QuitButton"){
                 MainMenuController.Quit();
+            } else if (result.gameObject.name == "Level 1"){
+                PauseMenu.Level1();
+            } else if (result.gameObject.name == "Level 2"){
+                PauseMenu.Level2();
+            } else if (result.gameObject.name == "Level 3"){
+                PauseMenu.Level3();
+            } else if (result.gameObject.name == "Level 4"){
+                PauseMenu.Level4();
+            } else if (result.gameObject.name == "Level 5"){
+                PauseMenu.Level5();
+            } else if (result.gameObject.name == "Resume Button"){
+                PauseMenu.ResumeButton();
+            } else if (result.gameObject.name == "Main Menu"){
+                PauseMenu.MainMenuButton();
             }
         }
     }
