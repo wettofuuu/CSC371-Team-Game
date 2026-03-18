@@ -138,3 +138,4 @@ public class LeverOpenBarrierA : MonoBehaviour
             raisedLeverCount = Mathf.Max(0, raisedLeverCount - 1);
     }
 }
+

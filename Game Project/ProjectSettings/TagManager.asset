@@ -11,6 +11,7 @@ TagManager:
   - BarrierA
   - BarrierB
   - BarrierC
+  - LiftBarrier
   layers:
   - Default
   - TransparentFX
