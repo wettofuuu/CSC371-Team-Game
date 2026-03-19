@@ -1350,7 +1350,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1366875126}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
-        m_MethodName: Options
+        m_MethodName: Story
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1770,6 +1770,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   sceneToLoad: TutorialScene
+  StorysceneToLoad: StorySceneUI
   menuMusic: {fileID: 2135890502}
 --- !u!4 &1366875127
 Transform:

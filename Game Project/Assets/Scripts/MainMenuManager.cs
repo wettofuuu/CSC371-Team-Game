@@ -6,6 +6,9 @@ public class MainMenuController : MonoBehaviour
     [Tooltip("Scene name to load when Play is pressed")]
     public string sceneToLoad = "TutorialScene";
 
+    [Tooltip("Scene name to load when Story is pressed")]
+    public string StorysceneToLoad = "StorySceneUI";
+
     [Header("Main Menu Music")]
     [Tooltip("Drag the AudioSource that should play on the main menu (turn off Play On Awake on it).")]
     public AudioSource menuMusic;
@@ -46,6 +49,14 @@ public class MainMenuController : MonoBehaviour
 
         SceneManager.LoadScene(sceneToLoad);
     }
+
+
+    //Called by Story button OnClick
+    public void Story()
+    {
+        SceneManager.LoadScene(StorysceneToLoad);
+    }
+
 
     // Called by Options button OnClick (does nothing)
     public void Options()
