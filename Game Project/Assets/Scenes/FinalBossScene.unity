@@ -7921,6 +7921,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: febcebcdc9ac1eb4aaeea4b7468e31f5, type: 3}
+--- !u!114 &276385530 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4474387694046427947, guid: febcebcdc9ac1eb4aaeea4b7468e31f5, type: 3}
+  m_PrefabInstance: {fileID: 276385529}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c82ad9f155641e04c9686fac33da7e8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PauseMenu
 --- !u!1001 &279149860
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -46993,7 +47004,8 @@ MonoBehaviour:
   cursor: {fileID: 1802927910}
   LevelCompletePopup: {fileID: 0}
   MainMenuController: {fileID: 0}
-  PauseMenu: {fileID: 0}
+  PauseMenu: {fileID: 276385530}
+  StoryUIController: {fileID: 0}
 --- !u!114 &1713080494
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -49586,7 +49598,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.18867922, g: 0.18867922, b: 0.18867922, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -57645,7 +57657,7 @@ PrefabInstance:
     - target: {fileID: 8827651533265007621, guid: 19be689e5f4b318438cb2260f21dae0c, type: 3}
       propertyPath: sfxSource
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 533073803}
     - target: {fileID: 8827651533265007621, guid: 19be689e5f4b318438cb2260f21dae0c, type: 3}
       propertyPath: respawnPoint
       value: 
@@ -57653,7 +57665,7 @@ PrefabInstance:
     - target: {fileID: 8827651533265007621, guid: 19be689e5f4b318438cb2260f21dae0c, type: 3}
       propertyPath: footstepSource
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 317880915}
     - target: {fileID: 8827651533265007621, guid: 19be689e5f4b318438cb2260f21dae0c, type: 3}
       propertyPath: VirtualCursorRectTransform
       value: 
