@@ -9,6 +9,7 @@ public class VirtualMouse : MonoBehaviour
     public LevelCompletePopup LevelCompletePopup;
     public MainMenuController MainMenuController;
     public PauseMenu PauseMenu;
+    public StoryUIController StoryUIController;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start(){
@@ -54,6 +55,14 @@ public class VirtualMouse : MonoBehaviour
                 PauseMenu.ResumeButton();
             } else if (result.gameObject.name == "Main Menu"){
                 PauseMenu.MainMenuButton();
+            } else if (result.gameObject.name == "StoryButton"){
+                MainMenuController.Story();
+            } else if (result.gameObject.name == "BackButton"){
+                StoryUIController.PreviousPage();
+            } else if (result.gameObject.name == "NextButton"){
+                StoryUIController.NextPage();
+            } else if (result.gameObject.name == "ReturnButton"){
+                StoryUIController.ReturnToMainMenu();
             }
         }
     }

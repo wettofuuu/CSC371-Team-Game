@@ -57645,7 +57645,7 @@ PrefabInstance:
     - target: {fileID: 8827651533265007621, guid: 19be689e5f4b318438cb2260f21dae0c, type: 3}
       propertyPath: sfxSource
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 533073803}
     - target: {fileID: 8827651533265007621, guid: 19be689e5f4b318438cb2260f21dae0c, type: 3}
       propertyPath: respawnPoint
       value: 
@@ -57653,7 +57653,7 @@ PrefabInstance:
     - target: {fileID: 8827651533265007621, guid: 19be689e5f4b318438cb2260f21dae0c, type: 3}
       propertyPath: footstepSource
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 317880915}
     - target: {fileID: 8827651533265007621, guid: 19be689e5f4b318438cb2260f21dae0c, type: 3}
       propertyPath: VirtualCursorRectTransform
       value: 
