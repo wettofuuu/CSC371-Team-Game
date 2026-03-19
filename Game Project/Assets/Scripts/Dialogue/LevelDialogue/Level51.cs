@@ -6,7 +6,7 @@ public class Level51 : DialogueData
     {
         DialogueLines = new string[]
         {
-            "Hey there! It looks like you have to flick the levers on the other side of these obstacles..." 
+            "Hey there! If you want to reach Big Tom your doing to have to activate two levers. One on the left side and one on the right. Be careful though the levers are protected" 
         };
     }
 }
