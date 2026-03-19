@@ -308,7 +308,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -500, y: -500}
+  m_AnchoredPosition: {x: -504, y: -433}
   m_SizeDelta: {x: 250, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &540763055
@@ -456,7 +456,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -500}
+  m_AnchoredPosition: {x: 2, y: -432}
   m_SizeDelta: {x: 250, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &613170809
@@ -953,18 +953,34 @@ MonoBehaviour:
   backButton: {fileID: 540763053}
   returnButton: {fileID: 1162508149}
   pages:
-  - storyText: 'Long ago there was once a kingdom of in the sky made up entirely
-      of cats. These cats lived in harmony with one another eating all the catnip
-      their little hearts desired. '
+  - storyText: "Long ago, high above the clouds, there existed a vast and wondrous
+      kingdom floating gently in the sky, made up entirely of cats. The land was
+      lush with rolling hills of soft grass, shimmering rivers that reflected the
+      stars even in daylight, and endless fields of fragrant catnip that swayed in
+      the breeze. Cats of every kind lived there\u2014playful kittens, wise elders,
+      nimble hunters, and curious dreamers\u2014all sharing their days in harmony.
+      They built cozy homes among the clouds, told stories beneath glowing lanterns,
+      and spent their nights gazing at the constellations, believing their kingdom
+      would last forever in peace and abundance."
     backgroundImage: {fileID: 21300000, guid: d8cc60f80c4e84178b8488ddc37842b9, type: 3}
-  - storyText: 'One fateful day however the EVIL black cat BIG TOM arrived and conquered
-      this once peaceful kingdom. Having all the precious catnip to himself the cats
-      of this kingdom could do nothing but starve. '
-    backgroundImage: {fileID: 21300000, guid: e377532877dcf464db7307e23e292fb8, type: 3}
-  - storyText: 'This is where you come in. You are the chosen hero of legend. You
-      are the cat who must reclaim the catnip that Big Tom has stolen so that none
-      of the other cats will continue to go hungry. Now go forth and embrace your
-      destiny. '
+  - storyText: "But peace, as it often does, was not meant to last. One fateful day,
+      the sky darkened without warning, and a chilling wind swept across the kingdom.
+      From the shadows emerged an ominous figure\u2014an enormous black cat known
+      only as BIG TOM. With piercing eyes and a presence that silenced even the bravest
+      among them, he descended upon the kingdom and claimed it as his own. Using
+      fear and force, he seized control of the great catnip fields, hoarding their
+      bounty for himself alone. The once joyful land fell into despair as food grew
+      scarce, laughter faded, and the cats\u2014once united\u2014now struggled simply
+      to survive under his oppressive rule."
+    backgroundImage: {fileID: 21300000, guid: d8cc60f80c4e84178b8488ddc37842b9, type: 3}
+  - storyText: "Yet even in the darkest of times, hope refuses to vanish completely.
+      Whispers began to spread among the remaining cats of an ancient legend\u2014a
+      prophecy of a chosen hero who would rise when the kingdom needed them most.
+      That hero is you. You are the one destined to challenge BIG TOM, to journey
+      across the fractured skies, brave hidden dangers, and reclaim the stolen catnip
+      that sustains your people. The fate of the kingdom now rests in your paws.
+      Will you rise to meet your destiny, restore harmony to the skies, and bring
+      light back to a world shrouded in shadow? The adventure begins now."
     backgroundImage: {fileID: 21300000, guid: 64839053523bb458bbe96bf6f24e73b2, type: 3}
   mainMenuSceneName: MainMenu
 --- !u!4 &847046235
@@ -1603,7 +1619,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 500, y: -500}
+  m_AnchoredPosition: {x: 499, y: -433}
   m_SizeDelta: {x: 250, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1348712927
@@ -1854,6 +1870,81 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1396828350
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1396828351}
+  - component: {fileID: 1396828353}
+  - component: {fileID: 1396828352}
+  m_Layer: 5
+  m_Name: Panel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1396828351
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1396828350}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1526662854}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1396828352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1396828350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.83137256}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1396828353
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1396828350}
+  m_CullTransparentMesh: 1
 --- !u!1 &1414490245
 GameObject:
   m_ObjectHideFlags: 0
@@ -1987,6 +2078,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 953646853}
+  - {fileID: 1396828351}
   - {fileID: 2127935439}
   - {fileID: 1414490246}
   m_Father: {fileID: 0}
@@ -2028,10 +2120,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1526662854}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.5}
-  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -160, y: 500}
+  m_SizeDelta: {x: 1500, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2127935440
 CanvasRenderer:
