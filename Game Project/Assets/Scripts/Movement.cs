@@ -115,6 +115,22 @@ public class Movement : MonoBehaviour
         }
     }
 
+    public void TakeLifeDamage(int amount = 1)
+    {
+        if (amount <= 0) return;
+
+        Lives -= amount;
+        if (Lives < 0) Lives = 0;
+
+        UpdateLivesUI();
+
+        if (Lives <= 0)
+        {
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(loseSceneName);
+        }
+    }
+
     // ResetLives now updates UI immediately (if present) and also notifies any existing Movement instances
     public static void ResetLives()
     {
@@ -213,7 +229,7 @@ public class Movement : MonoBehaviour
 
         Spinning = true;
         LastSpinTime = Time.time;
-        StartCoroutine(StopSpinAfterDelay(0.15f));
+        StartCoroutine(StopSpinAfterDelay(0.25f));
     }
 
     private void OnMoveClick(InputValue value)
