@@ -5,6 +5,10 @@ public class DashPowerUp : MonoBehaviour
 {
     public GameObject UIPopup;
     public float PopupTime = 2f;
+    
+    [SerializeField] private AudioSource sfxSource;
+
+    [SerializeField] private AudioClip AbilityPickUp;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -14,16 +18,13 @@ public class DashPowerUp : MonoBehaviour
 
         m.EnableDash();             // unlock dash
 
+        sfxSource.PlayOneShot(AbilityPickUp);
+
         if (UIPopup != null){
-            StartCoroutine(ShowPopup());
+            UIPopup.SetActive(true);
+            UIPopup.GetComponent<UIPopup>().Show();
         }
 
-        gameObject.SetActive(false); // or Destroy(gameObject);
-    }
-
-    private IEnumerator ShowPopup(){
-        UIPopup.SetActive(true);
-        yield return new WaitForSeconds(PopupTime);
-        UIPopup.SetActive(false);
+        gameObject.SetActive(false);
     }
 }
